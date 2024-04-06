@@ -1,0 +1,5 @@
+body {
+    background-image: url('/trophy.jpg'); /* Specify the path to your image */
+    background-size: cover; /* Cover the entire background */
+    background-position: center; /* Center the background image */
+}

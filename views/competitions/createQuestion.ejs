@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="create-question content">
+        <h2>Create Question Set</h2>
+        
+        <% if (type === 'submission') { %>
+            <!-- File upload form for submission type -->
+            <form action="/submitSubmission" method="POST" enctype="multipart/form-data">
+                <input type="file" name="submissionFile" accept=".pdf, .doc, .docx">
+                <button type="submit">Submit</button>
+            </form>
+        <% } else if (type === 'mcq') { %>
+            <!-- Dynamic input fields for MCQ type -->
+            <form action="/submitMCQ" method="POST">
+                <% for (let i = 0; i < numQuestions; i++) { %>
+                    <label for="question<%= i + 1 %>">Question <%= i + 1 %>:</label>
+                    <input type="text" name="question<%= i + 1 %>" required>
+                    <br>
+                <% } %>
+                <button type="submit">Submit</button>
+            </form>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="announcements content">
+        <h2><%= title %></h2>
+        <p><%= announcement.content %></p>
+        <p>Created at: <%= announcement.createdAt %></p>
+    
+        <% if (user.isAdmin || announcement.createdBy.toString() === user._id.toString()) { %>
+            <button class="delete-btn" data-id="<%= comp._id %>" data-index="<%= announcementIndex %>">Delete</button>
+        <% } %>
+
+        <h3>Comments</h3>
+        <form action="/competitions/<%= comp._id %>/<%= announcementIndex %>" method="POST">
+            <textarea name="comment_content" rows="2" cols="50" placeholder="Post a comment..." required></textarea>
+            <button type="submit">Post Comment</button>
+        </form>
+
+        <% if (announcement.comments && announcement.comments.length > 0) { %>
+            <ul class="comments-list">
+                <% announcement.comments.forEach(function(comment, index) { %>
+                    <li>
+                        <p><strong><%= comment.author.username %>:</strong> <%= comment.content %></p>
+                        <p>Created at: <%= comment.createdAt %></p>
+                        <!-- delete button -->
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No comments yet.</p>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+
+        // delete announcement
+        document.querySelector('.delete-btn').addEventListener('click', async () => {
+            const compId = document.querySelector('.delete-btn').dataset.id;
+            const index = document.querySelector('.delete-btn').dataset.index;
+
+            try {
+                const response = await fetch(`/competitions/${compId}/${index}/delete`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete announcement');
+                }
+
+                // Redirect to the announcement details page
+                window.location.href = `/competitions/${compId}`;
+            } catch (error) {
+                console.error('Error:', error.message);
+            }
+        });
+
+    </script>
+
+</body>
+</html>

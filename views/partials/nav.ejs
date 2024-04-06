@@ -1,0 +1,17 @@
+<nav>
+    <div class="site-title">
+        <h1>Welcome, <%= user.username %></h1> 
+        <a href="/competitions/home"><h1>Rankers</h1></a>
+        <p>Competition Management site</p>
+    </div>
+
+    <ul>
+        <% if (user.isAdmin) { %>
+            <li><a href="/admins/adminUsers">Users</a></li>
+            <li><a href="/admins/authenticate">Authenticate Users</a></li>
+        <% } else { %>
+            <li><a href="/competitions/home">My Competitions</a></li>
+        <% } %>
+        <li><a href="/signout">Sign Out</a></li>
+    </ul>
+</nav>

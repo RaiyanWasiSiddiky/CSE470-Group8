@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/head.ejs') %>
+<link rel="stylesheet" href="/unlogstyles.css">
+
+<body>
+<div class="form-container">
+  <div class="form-heading">
+  </div>
+  <form action="/resetPassword" method="POST">
+    <h2>Please answer security question to reset password</h2>
+    <div class="form-group">
+        <label for="email">Enter Your email?</label>
+        <input type="text" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+      <label for="securityquestion">Select a security question:</label>
+      <select id="securityquestion" name="securityquestion" onchange="checkQuestionType()" required>
+        <option value="">Select a question</option>
+        <option value="birthday">When is your mother's birthday?</option>
+        <option value="pet">What was the name of your first pet?</option>
+        <option value="meal">What is your favorite meal?</option>
+        <option value="hotel">Which hotel did you stay at in your first ever trip?</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="securityanswer">Your answer:</label>
+      <input type="text" id="securityanswer" name="securityanswer" required>
+    </div>
+    <div class="form-group">
+      <label for="firsttry">Enter new password</label>
+      <input type="text" id="firsttry" name="firsttry" required>
+    </div>
+    <div class="form-group">
+      <label for="secondtry">Confirm Password</label>
+      <input type="text" id="secondtry" name="secondtry" required>
+    </div>
+    <div class="form-group">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+  <%- include('./partials/footer.ejs') %>
+</div>
+
+<script>
+  function checkQuestionType() {
+    const selectedQuestion = document.getElementById('security-question').value;
+    const answerInput = document.getElementById('security-answer');
+
+    if (selectedQuestion === "When is your mother's birthday?") {
+      answerInput.type = 'date';
+    } else {
+      answerInput.type = 'text';
+    }
+  }
+</script>
+
+</body>
+</html>

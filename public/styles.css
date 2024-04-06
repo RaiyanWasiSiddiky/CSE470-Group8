@@ -1,0 +1,117 @@
+.container {
+  background: linear-gradient(to bottom, #ffbf80, #ff8c00); /* Gradient background from lighter to darker orange-gold */
+  border-radius: 20px; /* Rounded corners */
+  padding: 20px; /* Add some padding */
+  margin: 120px auto 0; /* Center the container vertically and horizontally */
+  max-width: 400px; /* Limit the width of the container */
+  text-align: center; /* Center the content inside the container */
+}
+.header {
+  font-size: 2em;
+  text-align: center; 
+  margin-top: 50px;
+  font-family: 'Roboto', sans-serif;
+}
+.button-container {
+  text-align: center;
+}
+/* Define the initial styles for the button */
+.glow-button {
+  background-color: transparent;
+  border: 2px solid #007bff; /* Blue border */
+  color: #007bff; /* Blue text color */
+  padding: 10px 20px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for background-color and box-shadow */
+  position: relative; /* Set position to relative */
+  z-index: 1; /* Ensure button appears above background */
+}
+
+/* Define the hover effect for the button */
+.glow-button:hover {
+  background-color: rgba(0, 123, 255, 0.3); /* Blue hue with alpha (transparency) */
+  box-shadow: 0 0 80px rgba(0, 123, 255, 0.7); /* Larger and more intense blue shadow */
+}
+
+.about {
+  margin-top: 80px;
+  font-family: 'Roboto', sans-serif;
+}
+
+footer{
+  margin-top: 50px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  
+  .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50%; /* Set the height of the modal content */
+    width: 80%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center the content vertically */
+  }
+  
+  .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .line {
+    position: absolute;
+    height: 100%; /* Span the entire height of the modal content */
+    width: 2px;
+    background-color: #000;
+    left: 50%;
+    top: 0; /* Align the line to the top of the modal content */
+    transform: translateX(-50%);
+  }
+  
+  .left-option,
+  .right-option {
+    width: 50%;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+  }
+
+  .not-found {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+.not-found::before {
+    content: 'OOPS, ';
+    font-size: 3rem;
+    color: #dc3545;
+}
+
+.not-found::after {
+    content: 'page not found :(';
+    font-size: 1.5rem;
+}

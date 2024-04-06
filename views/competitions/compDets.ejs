@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="details content">
+        
+        <h2><%= comp.title %></h2>
+        <div class="content">
+            <p><%= comp.about %></p>
+        </div>
+
+        <!-- Show delete button only if isAdmin or user._id === host -->
+        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+            <a class="delete" data-doc="<%= comp._id %>">
+                <img src="/trashcan.svg" alt="delete icon">
+            </a>
+        <% } %>
+
+        <button id="createQuestionBtn" class="btn">Create Question Set</button>
+
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="options">
+                <a href="/competitions/<%= comp._id %>/createQuestion?type=submission" class="left-option">Submission</a>
+                <div class="line"></div>
+                <a href="/competitions/<%= comp._id %>/createQuestion?type=mcq" class="right-option">MCQ</a>
+              </div>
+            </div>
+        </div>
+        
+        <!-- Form for posting text content -->
+        <form action="/competitions/<%= comp._id %>" method="POST">
+            <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
+            <button type="submit">Post</button>
+        </form>
+
+        <!-- Display announcements -->
+        <div class="announcements">
+            <% comp.announcements.forEach((announcement, index) => { %>
+                <div class="announcement">
+                    <p>Created by: <%= announcement.createdBy %></p> <!-- Display the username of the creator -->
+                    <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
+                        <p><%= announcement.content %></p>
+                    </a>
+        
+                    <p class="date"><%= announcement.createdAt.toLocaleString() %></p>
+                    <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
+                        <p>Comments</p>
+                    </a>
+                </div>
+            <% }); %>
+        </div>
+
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+        const trashcan = document.querySelector('a.delete');
+    
+        trashcan.addEventListener('click', (e)=>{
+            const endpoint = `/competitions/${trashcan.dataset.doc}/delete`;
+    
+            fetch(endpoint, {
+                method: "DELETE"
+            })
+            .then((response)=>response.json())
+            .then((data)=> window.location.href = data.redirect)
+            .catch((err)=>{
+                console.log(err);
+            });
+        });
+    
+        // Popup
+        let modal = document.getElementById("myModal");
+    
+        // Get the button that opens the modal
+        let btn = document.getElementById("createQuestionBtn");
+    
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+            modal.style.display = "block";
+        };
+    
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    
+        // Handle click on MCQ option
+        document.addEventListener('DOMContentLoaded', function() {
+            const mcqOption = document.querySelector('#myModal > div > div > a.right-option');
+            mcqOption.addEventListener('click', function(event) {
+                event.preventDefault(); 
+                
+                const numQuestions = prompt("Please enter the number of questions:", "1");
+
+                // If the user provides a valid number, navigate to the next page with the specified number of questions
+                if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
+                    const compId = '<%= comp._id %>';
+                    window.location.href = `/competitions/${compId}/createQuestion?type=mcq&numQuestions=${numQuestions}`;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/head.ejs') %>
+<link rel="stylesheet" href="/unlogstyles.css">
+
+<body>
+  <div class="form-container">
+    <div class="form-heading">
+      <h1>Create Account</h1>
+    </div>
+    <form action="/signup" method="POST">
+      <div class="form-group">
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" name="fullname" required>
+      </div>
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" minlength="5" maxlength="10" required>
+      </div>
+      <div class="form-group">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmpassword">Confirm Password:</label>
+        <input type="password" id="confirmpassword" name="confirmpassword" required>
+      </div>
+      <div class="form-group">
+        <label for="securityquestion">Security Question:</label>
+        <select id="securityquestion" name="securityquestion" required onchange="checkQuestionType()">
+          <option value="">Select a Security Question</option>
+          <option value="birthday">When is your mother's birthday?</option>
+          <option value="pet">What was the name of your first pet?</option>
+          <option value="meal">What is your favorite meal?</option>
+          <option value="hotel">Which hotel did you stay at in your first ever trip?</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="securityanswer">Security Answer:</label>
+        <input type="text" id="securityanswer" name="securityanswer" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Create Account</button>
+      </div>
+      <%- include('./partials/footer.ejs') %>
+    </form>
+  </div>
+
+  <script>
+    function checkQuestionType() {
+      const selectedQuestion = document.getElementById('securityquestion').value;
+      const answerInput = document.getElementById('securityanswer');
+
+      if (selectedQuestion === "birthday") {
+        answerInput.type = 'date';
+      } else {
+        answerInput.type = 'text';
+      }
+    }
+  </script>
+</body>
+</html>

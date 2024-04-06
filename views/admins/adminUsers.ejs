@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+    <%- include('../partials/nav.ejs') %>
+    <h1>All Users</h1>
+    <ul>
+        <% users.forEach(user => { %>
+            <li>
+                <strong>Username:</strong> <%= user.username %><br>
+                <strong>Email:</strong> <%= user.email %><br>
+                <!-- Add any other user details you want to display -->
+
+                <!-- Button to delete user -->
+                <form action="/admins/<%= user._id %>/delete" method="POST">
+                    <button type="submit">Delete User</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

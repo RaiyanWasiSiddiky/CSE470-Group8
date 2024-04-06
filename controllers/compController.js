@@ -1,14 +1,39 @@
-const {User, Admin, Competition} = require('../models/competition');
+const {User, Admin, Competition} = require('../models/schemas');
 
-const get_home = (req, res)=>{
+const get_home = (req, res) => {
   const user = req.session.user;
-  Competition.find().sort({ createdAt: -1 })
-    .then((result)=>{
-      res.render('competitions/home', { title: "All Competitions", comps: result, user:user });
-    })
-    .catch((err)=>{
-      console.log(err);
-    });
+  const searchQuery = req.query.search;
+
+  // Check if there is a search query
+  if (searchQuery) {
+      // If there is a search query, filter competitions based on the query
+      Competition.find({
+          $or: [
+              { title: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive title search
+              { genre: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive genre search
+              // Add more fields to search here if needed
+          ]
+      })
+      .sort({ createdAt: -1 })
+      .then((result) => {
+          res.render('competitions/home', { title: "Search Results", comps: result, user: user });
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).send('Internal Server Error');
+      });
+  } else {
+      // If there is no search query, fetch all competitions
+      Competition.find()
+      .sort({ createdAt: -1 })
+      .then((result) => {
+          res.render('competitions/home', { title: "All Competitions", comps: result, user: user });
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).send('Internal Server Error');
+      });
+  }
 };
 
 const get_comp = (req, res)=>{

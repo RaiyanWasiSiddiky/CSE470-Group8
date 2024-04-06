@@ -13,6 +13,12 @@
     <div class="Competition Content">
         <h2>All Competitions</h2>
 
+        <!-- Search bar -->
+        <form id="searchForm" class="search-form" action="/competitions/home" method="GET">
+            <input type="text" name="search" placeholder="Search by genre or title">
+            <button type="submit">Search</button>
+        </form>
+
         <a href="/competitions/createcomp">Create New Competition</a>
 
         <% if (comps.length > 0) { %>

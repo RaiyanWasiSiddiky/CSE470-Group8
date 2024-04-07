@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="applications">
+        <h2>All Applications</h2>
+        <% if (applications.length > 0) { %>
+            <ul>
+                <% applications.forEach(application => { %>
+                    <li>
+                        <h3><%= application.name %></h3>
+                        <p>Email: <%= application.email %></p>
+                        <p>Reason: <%= application.reason %></p>
+                        <!-- Add more details to display here -->
+                        <div class="action-buttons">
+                            <form action="/admins/authenticate" method="POST" style="display:inline;">
+                                <button type="submit" class="accept-button">Accept</button>
+                            </form>
+                            <form action="/admins/authenticate" method="POST" style="display:inline;">
+                                <button type="submit" class="reject-button">Reject</button>
+                            </form>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No applications found.</p>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

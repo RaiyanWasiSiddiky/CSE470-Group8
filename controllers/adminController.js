@@ -1,4 +1,4 @@
-const {User, Admin, Competition} = require('../models/schemas');
+const {User, Admin, Applicant, Competition} = require('../models/schemas');
 
 const get_adminUsers =  async (req, res) => {
     try {

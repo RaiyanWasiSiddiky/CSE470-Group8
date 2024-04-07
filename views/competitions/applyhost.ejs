@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="hostcontainer">
+        <h2>Apply for Host</h2>
+        <form action="/competitions/applyhost" method="POST">
+            <div class="form-group">
+                <label for="reason">Reason for applying:</label>
+                <textarea id="reason" name="reason" rows="4" required></textarea>
+            </div>
+            <button type="submit">Submit Application</button>
+        </form>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

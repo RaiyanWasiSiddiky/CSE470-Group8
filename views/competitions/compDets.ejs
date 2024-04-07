@@ -34,10 +34,12 @@
         </div>
         
         <!-- Form for posting text content -->
-        <form action="/competitions/<%= comp._id %>" method="POST">
-            <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
-            <button type="submit">Post</button>
-        </form>
+        <% if (user._id.toString() === comp.host.toString()) { %>
+            <form action="/competitions/<%= comp._id %>" method="POST">
+                <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
+                <button type="submit">Post</button>
+            </form>
+        <% } %>
 
         <!-- Display announcements -->
         <div class="announcements">

@@ -1,4 +1,4 @@
-const {User, Admin, Competition} = require('../models/schemas');
+const {User, Admin, Applicant, Competition} = require('../models/schemas');
 
 const get_home = (req, res) => {
   const user = req.session.user;
@@ -33,6 +33,36 @@ const get_home = (req, res) => {
           console.error(err);
           res.status(500).send('Internal Server Error');
       });
+  }
+};
+
+const get_applyhost = (req, res) => {
+  const user = req.session.user;
+  res.render('competitions/applyhost', { title: 'Apply for Host', user });
+};
+
+const post_applyhost = async (req, res) => {
+  try {
+      // Extract user data and application reason from request body
+      const { reason } = req.body;
+      const user = req.session.user; // Assuming user data is available in the request object
+
+      // Create a new applicant instance
+      const newApplicant = new Applicant({
+          user: user._id,
+          username: user.username,
+          email: user.email,
+          reason
+      });
+
+      // Save the new applicant to the database
+      await newApplicant.save();
+
+      // Send a success response
+      res.status(201).json({ message: 'Application submitted successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -256,6 +286,8 @@ module.exports = {
   get_home,
   get_comp,
   get_createcomp,
+  get_applyhost,
+  post_applyhost,
   post_createcomp,
   delete_comp,
   post_announcement,

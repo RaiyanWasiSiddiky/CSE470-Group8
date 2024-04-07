@@ -4,7 +4,7 @@
 <body>
     <%- include('../partials/nav.ejs') %>
 
-    <% if (!user.isAdmin) { %>
+    <% if (!user.isAdmin && !user.hostAuth) { %>
         <div class="apply-for-host">
             <a href="/competitions/applyhost" class="btn">Apply for Host</a>
         </div>

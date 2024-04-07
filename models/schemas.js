@@ -81,6 +81,31 @@ const adminSchema = new Schema({
     }
 });
 
+const applicantSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    reason: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
+    }
+}, { timestamps: true });
+
 
 const commentSchema = new Schema({
     content: {
@@ -158,10 +183,12 @@ const competitionSchema = new Schema({
 
 const User = mongoose.model('users', userSchema);
 const Admin = mongoose.model('admins', adminSchema);
+const Applicant = mongoose.model('applicants', applicantSchema);
 const Competition = mongoose.model('competitions', competitionSchema);
 
 module.exports = {
     User,
     Admin,
+    Applicant,
     Competition
 };

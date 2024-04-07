@@ -152,7 +152,7 @@ module.exports = {
     get_login,
     get_signup,
     get_forgotpass,
-    get_signout,
+    get_signout, 
     post_signup,
     post_login,
     post_resetPassword

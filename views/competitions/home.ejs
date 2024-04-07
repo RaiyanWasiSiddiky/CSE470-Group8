@@ -27,6 +27,11 @@
                     <a class="single" href="/competitions/<%= comp._id %>">
                         <h3 class="title"><%= comp.title %></h3>
                     </a>
+                    <p class="genre">Genre: <%= comp.genre %></p>
+                    <div class="host announcement-author">
+                        <p>By:</p>
+                        <h4><%= comp.hostUsername %></h4>
+                    </div>
                     <% if (user.isAdmin) { %>
                         <form id="deleteForm<%= comp._id %>" style="display:inline;">
                             <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">

@@ -8,6 +8,7 @@
     <div class="details content">
         
         <h2><%= comp.title %></h2>
+        <h4><%= comp.hostUsername %></h4>
         <div class="content">
             <p><%= comp.about %></p>
         </div>
@@ -41,12 +42,12 @@
         <div class="announcements">
             <% comp.announcements.forEach((announcement, index) => { %>
                 <div class="announcement">
-                    <p>Created by: <%= announcement.createdBy %></p> <!-- Display the username of the creator -->
+                    <h4><%= announcement.createdByUsername %></h4>
                     <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
                         <p><%= announcement.content %></p>
                     </a>
         
-                    <p class="date"><%= announcement.createdAt.toLocaleString() %></p>
+                    <h5 class="date"><%= announcement.createdAt.toLocaleString() %></h5>
                     <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
                         <p>Comments</p>
                     </a>

@@ -12,6 +12,7 @@
   margin-top: 50px;
   font-family: 'Roboto', sans-serif;
 }
+
 .button-container {
   text-align: center;
 }
@@ -114,4 +115,13 @@ footer{
 .not-found::after {
     content: 'page not found :(';
     font-size: 1.5rem;
+}
+
+.announcement-author {
+  display: flex; /* Use flexbox to arrange items horizontally */
+  align-items: center; /* Align items vertically in the center */
+}
+
+.announcement-author p {
+  margin-right: 5px; /* Add some spacing between "by:" and the username */
 }

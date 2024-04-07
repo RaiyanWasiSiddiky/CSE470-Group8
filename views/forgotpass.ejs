@@ -44,10 +44,10 @@
 
 <script>
   function checkQuestionType() {
-    const selectedQuestion = document.getElementById('security-question').value;
-    const answerInput = document.getElementById('security-answer');
+    const selectedQuestion = document.getElementById('securityquestion').value;
+    const answerInput = document.getElementById('securityanswer');
 
-    if (selectedQuestion === "When is your mother's birthday?") {
+    if (selectedQuestion === "birthday") {
       answerInput.type = 'date';
     } else {
       answerInput.type = 'text';

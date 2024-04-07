@@ -82,7 +82,6 @@ const adminSchema = new Schema({
 });
 
 
-// for competitionSchema
 const commentSchema = new Schema({
     content: {
         type: String,
@@ -92,13 +91,13 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User' 
     },
+    authorUsername: String, // Add a field to store the username
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-// for competitionSchema
 const announcementSchema = new Schema({
     content: {
         type: String,
@@ -108,6 +107,7 @@ const announcementSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    createdByUsername: String, // Add a field to store the username
     createdAt: {
         type: Date,
         default: Date.now
@@ -115,14 +115,13 @@ const announcementSchema = new Schema({
     comments: [commentSchema] 
 });
 
-// for competitionSchema
 const questionSetSchema = new Schema({
-    
     questions: [String], 
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    createdByUsername: String, // Add a field to store the username
     createdAt: {
         type: Date,
         default: Date.now
@@ -147,6 +146,7 @@ const competitionSchema = new Schema({
         ref: 'User',
         required: true
     },
+    hostUsername: String, // Add a field to store the username
     judges: [{
         type: Schema.Types.ObjectId,
         ref: 'User'

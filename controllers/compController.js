@@ -67,6 +67,7 @@ const post_createcomp = async (req, res) => {
           genre,
           about,
           host: user._id,
+          hostUsername: user.username,
           // Add the creator's user ID as a default judge
           judges: [user._id], // Assuming user ID is available in req.user
       });
@@ -119,6 +120,7 @@ const post_announcement = async (req, res) => {
     const newAnnouncement = {
         content: textContent,
         createdBy: user._id,
+        createdByUsername: user.username,
         createdAt: new Date()
     };
 
@@ -188,6 +190,7 @@ const post_comment = async (req, res) => {
     const newComment = {
         content: comment_content,
         author: user._id,
+        authorusername: user.username,
         createdAt: new Date()
     };
 

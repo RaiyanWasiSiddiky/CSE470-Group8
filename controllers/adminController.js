@@ -14,6 +14,57 @@ const get_adminUsers =  async (req, res) => {
     }
   };
 
+const get_authenticate = async (req, res) => {
+  try {
+      // Fetch all applications from the database
+      const user = req.session.user;
+      const applicants = await Applicant.find();
+
+      // Render the applications page with the retrieved applications data
+      res.render('admins/authenticate', { title: "Applicants", applicants, user });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+};
+
+
+const post_acceptApplicant = async (req, res) => {
+  try {
+    const applicantID = req.body.applicantID;
+
+    // Retrieve the user associated with the applicant
+    const applicant = await Applicant.findById(applicantID);
+    const userId = applicant.user;
+
+    // Update the user's hostAuth property to true
+    await User.findByIdAndUpdate(userId, { hostAuth: true });
+
+    // Delete the applicant from the collection
+    await Applicant.deleteOne({ _id: applicantID });
+
+    // Redirect back to the authenticate page after accepting
+    res.redirect('/admins/authenticate');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+const post_rejectApplicant = async (req, res) => {
+  try {
+    const applicantID = req.body.applicantID;
+
+    // Delete the applicant from the collection
+    await Applicant.deleteOne({ _id: applicantID });
+
+    // Redirect back to the authenticate page after rejecting
+    res.redirect('/admins/authenticate');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 
 const delete_user = async (req, res) => {
@@ -34,5 +85,8 @@ const delete_user = async (req, res) => {
 
   module.exports = {
     get_adminUsers,
-    delete_user
+    delete_user,
+    get_authenticate,
+    post_acceptApplicant,
+    post_rejectApplicant
   };

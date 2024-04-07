@@ -5,20 +5,21 @@
     <%- include('../partials/nav.ejs') %>
 
     <div class="applications">
-        <h2>All Applications</h2>
-        <% if (applications.length > 0) { %>
+        <h2>All Applicants</h2>
+        <% if (applicants.length > 0) { %>
             <ul>
-                <% applications.forEach(application => { %>
+                <% applicants.forEach(applicant => { %>
                     <li>
-                        <h3><%= application.name %></h3>
-                        <p>Email: <%= application.email %></p>
-                        <p>Reason: <%= application.reason %></p>
-                        <!-- Add more details to display here -->
+                        <h3><%= applicant.username %></h3>
+                        <p>Email: <%= applicant.email %></p>
+                        <p>Reason: <%= applicant.reason %></p>
                         <div class="action-buttons">
-                            <form action="/admins/authenticate" method="POST" style="display:inline;">
+                            <form action="/admins/authenticate/accept" method="POST" style="display:inline;">
+                                <input type="hidden" name="applicantID" value="<%= applicant._id %>">
                                 <button type="submit" class="accept-button">Accept</button>
                             </form>
-                            <form action="/admins/authenticate" method="POST" style="display:inline;">
+                            <form action="/admins/authenticate/reject" method="POST" style="display:inline;">
+                                <input type="hidden" name="applicantID" value="<%= applicant._id %>">
                                 <button type="submit" class="reject-button">Reject</button>
                             </form>
                         </div>
@@ -26,7 +27,7 @@
                 <% }); %>
             </ul>
         <% } else { %>
-            <p>No applications found.</p>
+            <p>No applicants found.</p>
         <% } %>
     </div>
 

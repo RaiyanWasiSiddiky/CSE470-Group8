@@ -98,11 +98,6 @@ const applicantSchema = new mongoose.Schema({
     reason: {
         type: String,
         required: true
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected'],
-        default: 'pending'
     }
 }, { timestamps: true });
 

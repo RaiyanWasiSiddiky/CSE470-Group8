@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judge Panel - Vote for the Best Submission</title>
+    <link rel="stylesheet" href="/public/styles/VoteJ.css">
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>Judge Panel - Vote for the Best Submission</h1>
+        </div>
+        <div class="main-container">
+            <% submissions.forEach((submission, index) => { %>
+                <div class="submission-container">
+                    <div class="participant-email">
+                        Submitted by: <%= submission.email %>
+                        <div class="vote-count">
+                            Number of votes: <%= submission.vote.numberOfVotes %>
+                            <i class="far fa-thumbs-up"></i>
+                        </div>
+                    </div>
+                    <% submission.submissions.forEach((sub, subIndex) => { %>
+                        <div class="submission">
+                            <div class="submission-content">
+                                <h2>Question <%= subIndex + 1 %>:</h2>
+                                <p><%= questions[subIndex] %></p>
+                                <h3>Answer:</h3>
+                                <p><%= sub %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+
+                    <div class="buttons">
+                        <form action="/vote-for-submission" method="POST">
+                            <input type="hidden" name="participant_email" value="<%= submission.email %>">
+                            <input type="hidden" name="organiser_email" value="<%= organiser_email %>">
+                            <button class="vote-btn">Vote for Best Submission</button>
+                        </form>
+                        <form action="/declare-winner" method="POST">
+                            <input type="hidden" name="participant_email" value="<%= submission.email %>">
+                            <input type="hidden" name="organiser_email" value="<%= organiser_email %>">
+                            <% if (participant_email === organiser_email) { %>
+                                <button class="vote-btn">Declare Winner</button>
+                            <% } %>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <script>
+        function voteForSubmissions(submissionIndex) {
+            alert(`Vote submitted for the best submission associated with submission index ${submissionIndex}`);
+        }
+    </script>
+</body>
+</html>

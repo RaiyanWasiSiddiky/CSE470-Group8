@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Competition</title>
+    <link rel="stylesheet" href="/public/styles/create-competition.css">
+</head>
+<body>
+    <div class="competition-creation-container">
+        <h2>Create New Competition</h2>
+        <form id="set-question-form" action="/setquestion" method="POST">
+            <!-- Add form fields for competition details -->
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+            
+            <label for="genre">Genre:</label>
+            <select id="genre" name="genre" required>
+                <option value="art">Art</option>
+                <option value="music">Music</option>
+                <option value="coding">Coding</option>
+                <option value="sports">Sports</option>
+                <!-- Add more genre options as needed -->
+            </select>
+            
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="rules">Rules:</label>
+            <textarea id="rules" name="rules" required></textarea>
+            
+            <label for="entry-requirements">Entry Requirements:</label>
+            <input type="text" id="entry-requirements" name="entry-requirements" required>
+            
+            <!-- Hidden input fields for storing title, description, genre, and judges' emails -->
+            <input type="hidden" id="titleInput" name="titleInput">
+            <input type="hidden" id="genreInput" name="genreInput">
+            <input type="hidden" id="descriptionInput" name="descriptionInput">
+            <input type="hidden" id="judges-emails" name="judges-emails">
+
+            <!-- Button to add judge -->
+            <button type="button" onclick="addJudge()">Add Judge</button>
+
+            <!-- Hidden input field for storing user's email -->
+            <input type="text" id="emailInput" name="email" value="<%=h email %>" hidden>
+
+
+            <!-- Button to set questions and submit the form -->
+            <button type="button" onclick="setQuestionsAndSubmit()">Set Questions</button>
+        </form>
+    </div>
+
+    <script>
+        function createDiv() {
+            var container = document.getElementById('set-question-form');
+            var div = document.createElement('div');
+            div.innerHTML = `
+                <input type="text" name="judges-input" placeholder="Enter Judge Name..." required>
+            `;
+            container.appendChild(div);
+        }
+
+        function addJudge() {
+            createDiv();
+        }
+
+        function setQuestionsAndSubmit() {
+            document.getElementById('titleInput').value = document.getElementById('title').value;
+            var genreSelect = document.getElementById('genre');
+            var selectedGenre = genreSelect.options[genreSelect.selectedIndex].value;
+            document.getElementById('genreInput').value = selectedGenre;            
+            document.getElementById('descriptionInput').value = document.getElementById('description').value;
+
+            var judgeEmails = [];
+            document.querySelectorAll('[name="judges-input"]').forEach(judgeInput => {
+                judgeEmails.push(judgeInput.value);
+            });
+
+            document.getElementById('judges-emails').value = judgeEmails;
+
+            document.getElementById('set-question-form').submit();
+        }
+    </script>
+
+</body>
+</html>

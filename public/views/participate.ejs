@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions Form</title>
+    <link rel="stylesheet" href="/public/styles/participaton.css">
+
+  
+</head>
+<body>
+
+<div class="competition-creation-container">
+    <h2>Answer the Questions</h2>
+    <form id="questions-form" action="/submit_questions" method="POST">
+        <div id="questions-container">
+            <% question.forEach(function(question, index) { %>
+                <div class="question-container">
+                    <p class="question"><%= question %></p>
+                    <textarea class="input-area" name="answer_<%= index %>" required></textarea>
+                </div>
+            <% }); %>
+        </div>
+
+        <input type="hidden" id="answers-array" name="answers" >
+        <input type="hidden"  name="participant_email" value=<%=participant_email%>>
+        <input type="hidden"  name="organiser_email" value=<%=organiser_email%> >
+
+
+
+        <div style="text-align: center;">
+            <button class="submit-button" onclick="submitForm()">Submit</button>
+        </div>
+    </form>
+</div>
+
+<script>
+     function submitForm() {
+        const answers = [];
+        let inputAreas = document.querySelectorAll('.input-area');
+        inputAreas.forEach(function(inputArea) {
+            answers.push(inputArea.value);
+        });
+        document.getElementById('answers-array').value = answers;
+        document.getElementById('questions-form').submit();
+    }
+</script>
+
+</body>
+</html>

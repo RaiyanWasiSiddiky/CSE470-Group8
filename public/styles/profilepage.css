@@ -1,0 +1,50 @@
+body{
+    background-image:  url('Competition\ image.webp');
+}
+
+
+.outer-container{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+.bottom-container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 3px solid black;
+}
+
+.top-container{
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+
+.review-container{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    margin:10px;
+    border-right:3px solid black;
+    font-size: 30px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: whitesmoke;
+}
+
+.profile-info{
+    border-bottom: 3px solid black;
+    background-color: yellowgreen;
+}
+
+.profile-pic {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%; /* Make it circular */
+    overflow: hidden; /* Hide overflowing parts */
+}
+
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image covers the entire container */
+}

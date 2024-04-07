@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Competitions</title>
+    <link rel="stylesheet"  href="/public/styles/viewcompetition.css">
+
+  
+</head>
+<body>
+    <div class="container">
+        <h1>List of Competitions</h1>
+        <div id="competitions-container" class="competitions-container">
+            <% competition.forEach(competition => { %>
+                <div class="competition-box">
+                    <div>Email: <%= competition.email %></div>
+                    <% if (competition.addedJudges && competition.addedJudges.includes(userEmail) || userEmail==competition.email) { %>
+                        <div>Type: Judge</div>
+                        <div>Genre:<%= competition.genre%></div>
+                        <form action="/judge" method="POST">
+                            <div class="form-group">
+                                <input type="text" value=<%= competition.email %> name="organiser_email" hidden>
+                                <input type="text" value=<%= userEmail %> name="participant_email" hidden>
+                                <button class="judge-btn" type="submit">Judge</button>
+                            </div>
+    
+                    <% } else { %>
+                        <div>Type: Competitor</div>
+                        <div>Genre:<%= competition.genre%></div>
+
+                        <form action="/participate" method="POST">
+                            <div class="form-group">
+                              <input type="text" value=<%= competition.email %> name="organiser_email" hidden>
+                              <input type="text" value=<%= userEmail %> name="participant_email" hidden>
+                              <button class="judge-btn" type="submit">Participate</button>
+                            </div>
+                        </form>
+                        <form action="/profilepage" method="POST">
+                            <div class="form-group">
+                              <input type="text" value=<%= competition.email %> name="email" hidden>
+                              <button class="judge-btn" type="submit">View Profile</button>
+                            </div>
+                        </form>
+                    <% } %>
+                    
+               
+                  
+              
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</body>
+</html>

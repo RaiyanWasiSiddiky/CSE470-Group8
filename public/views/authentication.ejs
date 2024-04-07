@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competition Host Authentication</title>
+    <link rel="stylesheet" href="/public/styles/authenticate.css">
+
+    
+</head>
+<body>
+    <div class="authentication-container">
+        <h2>Competition Host Authentication</h2>
+        <p>Please provide your credentials for further authentication:</p>
+        <form action="/authenticate-to-admin" method="POST">
+            <!-- Add form fields for authentication -->
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="name" required>
+            <label for="username">E-mail:</label>
+            <input type="text" id="username" name="email" required>
+            <label for="username">Competition Title:</label>
+            <input type="text" id="username" name="purpose" required>
+            <label for="details">Purpose of competition:</label>
+            <textarea id="details" name="details" rows="4" required></textarea>
+            <button type="submit">Authenticate</button>
+        </form>
+    </div>
+</body>
+</html>

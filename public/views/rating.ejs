@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate and Review Competition</title>
+<link rel="stylesheet" href="/public/styles/RatingComp.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rate and Review Competition</h1>
+        <div id="competition-info" class="competition-info">
+            <!-- Competition information will be dynamically filled here -->
+        </div>
+        <div id="rating-form" class="rating-form">
+            <h2>Rate the Competition</h2>
+            <div class="rating">
+                <span class="rating-icon" onclick="setRating(1)">1</span>
+                <span class="rating-icon" onclick="setRating(2)">2</span>
+                <span class="rating-icon" onclick="setRating(3)">3</span>
+                <span class="rating-icon" onclick="setRating(4)">4</span>
+                <span class="rating-icon" onclick="setRating(5)">5</span>
+            </div>
+            <h2 >Write a Review</h2>
+            <textarea id="review-given"  rows="10" required></textarea>
+
+            <form id="rating-form" action="/submit-review" method="POST">
+                <input id="rating" name="rating" value="" hidden>
+                <input id="review" name="review" value="" hidden>
+                <input id="email" name="organiser_email" value="<%=organiser_email%>" hidden>
+                <button id="submit-btn"  onclick="submitRatingAndReview()">Submit</button>
+            </form>
+            
+        </div>
+    </div>
+
+    <script>
+        var val=0;
+        function setRating(value){
+            document.getElementById("rating").value = parseInt(value);
+            var ratingIcons = document.getElementsByClassName("rating-icon");
+            for (var i = 0; i < ratingIcons.length; i++) {
+                if (i == value-1 && ratingIcons[i].style.backgroundColor === "") {
+                    ratingIcons[i].style.backgroundColor = "green";
+                    // Change color of selected icons to green
+                    val=i+1;
+                } else {
+                    ratingIcons[i].style.backgroundColor = "";
+                }
+            }
+        };
+        
+        function submitRatingAndReview(){
+            var reviewText = document.getElementById("review-given").value; // Get the text from the textarea
+            document.getElementById("review").value = reviewText;
+            document.getElementById("rating").value = val;
+            document.getElementById("rating-form").submit();
+        }
+    </script>
+    
+</body>
+</html>

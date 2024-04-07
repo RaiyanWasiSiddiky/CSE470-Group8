@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Question</title>
+    <link rel="stylesheet" href="/public/styles/competition.css">
+    
+</head>
+<body>
+
+<div class="container">
+    <form action="/addques" method="POST" id="questionsForm">
+        <div class="controls">
+            <button onclick="addQuestion()">Add Question</button>
+            <button onclick="submitQuestions()">Submit Questions</button>
+
+        </div>
+        <!-- Hidden input fields for additional data -->
+        <input type="hidden" name="email" value="<%= email %>">
+        <input type="hidden" name="genre" value="<%= genre %>">
+        <input type="hidden" name="judge" value="<%= judge %>">
+        <!-- Hidden input field for questions array -->
+        <input type="hidden"  id="questionsInput" value="" hidden>
+        <!-- Questions will be added dynamically here -->
+    </form>
+</div>
+
+
+
+
+
+
+<script>
+    var questionIndex = 1;
+    var questionsArray = [];
+
+    function createDiv(index) {
+        var container = document.getElementById('questionsForm');
+        var div = document.createElement('div');
+        div.innerHTML = `
+            <p>Question ${questionIndex}</p>
+            <input type="text" name="questions" placeholder="Enter the question..." required>
+        `;
+        container.appendChild(div);
+    }
+
+    function addQuestion() {
+        createDiv(questionIndex);
+        questionIndex++;
+    }
+
+    function submitQuestions() {
+        var inputs = document.querySelectorAll('.item input[type="text"]');
+        questionsArray = [];
+        inputs.forEach(input => {
+            questionsArray.push(input.value);
+        });
+        // Set the value of the questions input field
+        document.getElementById('questionsInput').value = questionsArray;
+        // You can optionally validate the form here before submitting
+        document.getElementById('questionsForm').submit();
+    }
+</script>
+
+
+</body>
+</html>

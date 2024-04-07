@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin View</title>
+</head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-image: url('/public/styles/Competition\ image.webp'); /* Replace 'background-image.jpg' with the path to your image */
+    background-size: cover; /* Cover the entire page */
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    box-shadow: 0 0 10px rgba(5, 5, 5, 0.1);
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  h2 {
+    color: #333;
+  }
+  .info {
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  input[type="email"],
+  input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8; /* Light gray background for read-only fields */
+    pointer-events: none; /* Make the input fields read-only */
+  }
+  textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8; /* Light gray background for read-only fields */
+    pointer-events: none; /* Make the textarea read-only */
+  }
+  button {
+    background-color: #5cb85c; /* Green color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #4cae4c; /* Darker green on hover */
+  }
+  .deny-button {
+    background-color: #d9534f; /* Red color */
+  }
+  .deny-button:hover {
+    background-color: #c9302c; /* Darker red on hover */
+  }
+</style>
+<body>
+<div class="container">
+  <h2>Applicant Details</h2>
+  <% obj.forEach(function(document) { %>
+    <div class="info">
+      <label for="creatorName">Creator's Name:</label>
+      <input type="text" id="creatorName" name="creatorName" value="<%= document.details.name %>" readonly>
+      <label for="creatorEmail">Creator's Email:</label>
+      <input type="email" id="creatorEmail" name="creatorEmail" value="<%= document.details.email %>" readonly>
+      <label for="competitionTitle">Competition Title:</label>
+      <input type="text" id="competitionTitle" name="competitionTitle" value="<%= document.details.title %>" readonly>
+      <label for="details">Purpose of competition:</label>
+      <textarea id="detaisls" name="details" rows="4" readonly><%= document.details.purpose %></textarea>
+    </div>
+    <form action="/approve" method="POST">
+      <button type="submit" class="approve">Approve</button>
+      <input type="hidden" name="email" value="<%= document.details.email %>">
+    </form>
+    
+  <% }); %>
+
+  
+  
+</div>
+</body>
+</html>

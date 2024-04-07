@@ -190,7 +190,7 @@ const post_comment = async (req, res) => {
     const newComment = {
         content: comment_content,
         author: user._id,
-        authorusername: user.username,
+        authorUsername: user.username,
         createdAt: new Date()
     };
 

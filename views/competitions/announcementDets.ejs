@@ -8,7 +8,8 @@
     <div class="announcements content">
         <h2><%= title %></h2>
         <p><%= announcement.content %></p>
-        <p>Created at: <%= announcement.createdAt %></p>
+        <h4>by: <%= announcement.createdByUsername %></h4>
+        <h5>Created at: <%= announcement.createdAt %></h5>
     
         <% if (user.isAdmin || announcement.createdBy.toString() === user._id.toString()) { %>
             <button class="delete-btn" data-id="<%= comp._id %>" data-index="<%= announcementIndex %>">Delete</button>
@@ -24,8 +25,8 @@
             <ul class="comments-list">
                 <% announcement.comments.forEach(function(comment, index) { %>
                     <li>
-                        <p><strong><%= comment.author.username %>:</strong> <%= comment.content %></p>
-                        <p>Created at: <%= comment.createdAt %></p>
+                        <p><strong><%= comment.authorUsername %>:</strong> <%= comment.content %></p>
+                        <h5>Created at: <%= comment.createdAt %></h5>
                         <!-- delete button -->
                     </li>
                 <% }); %>

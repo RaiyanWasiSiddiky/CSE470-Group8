@@ -16,6 +16,7 @@ router.post('/:id/:index', compController.post_comment);
 
 router.delete('/:id/delete', compController.delete_comp);
 router.delete('/:id/:index/delete', compController.delete_announcement);
+router.delete('/:id/:index/:commentIndex/delete', compController.delete_comment);
 
 
 module.exports =router;

@@ -21,7 +21,9 @@
             </a>
         <% } %>
 
-        <button id="createQuestionBtn" class="btn">Create Question Set</button>
+        <% if (user._id.toString() === comp.host.toString()) { %>
+            <button id="createQuestionBtn" class="btn">Create Question Set</button>
+        <% } %>
 
         <div id="myModal" class="modal">
             <div class="modal-content">
@@ -46,14 +48,21 @@
             <% comp.announcements.forEach((announcement, index) => { %>
                 <div class="announcement">
                     <h4><%= announcement.createdByUsername %></h4>
-                    <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
+                    <a class="single" href="/competitions/<%= comp._id %>/<%= index %>">
                         <p><%= announcement.content %></p>
                     </a>
-        
+
                     <h5 class="date"><%= announcement.createdAt.toLocaleString() %></h5>
                     <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
-                        <p>Comments</p>
+                        <h5>Comments</h5>
                     </a>
+
+                    <!-- Show delete button only if isAdmin or user._id === host -->
+                    <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+                        <button class="delete-announcement" data-announcement="<%= index %>">
+                            Delete
+                        </button>
+                    <% } %>
                 </div>
             <% }); %>
         </div>
@@ -63,47 +72,93 @@
     <%- include('../partials/footer.ejs') %>
 
     <script>
+        const deleteCompetition = (competitionId) => {
+            if (confirm('Are you sure you want to delete this competition?')) {
+                const endpoint = `/competitions/${competitionId}/delete`;
+    
+                fetch(endpoint, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page or update the UI as needed
+                        window.location.href = '/competitions/home';
+                    } else {
+                        // Handle errors
+                        console.error('Error deleting competition');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        };
+    
         const trashcan = document.querySelector('a.delete');
-    
+        
         trashcan.addEventListener('click', (e)=>{
-            const endpoint = `/competitions/${trashcan.dataset.doc}/delete`;
-    
-            fetch(endpoint, {
-                method: "DELETE"
-            })
-            .then((response)=>response.json())
-            .then((data)=> window.location.href = data.redirect)
-            .catch((err)=>{
-                console.log(err);
+            const competitionId = trashcan.dataset.doc;
+            deleteCompetition(competitionId);
+        });
+
+
+        const deleteAnnouncement = (competitionId, announcementIndex) => {
+            if (confirm('Are you sure you want to delete this announcement?')) {
+                const endpoint = `/competitions/${competitionId}/${announcementIndex}/delete`;
+
+                fetch(endpoint, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page or update the UI as needed
+                        location.reload();
+                    } else {
+                        // Handle errors
+                        console.error('Error deleting announcement');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        };
+
+        const deleteButtons = document.querySelectorAll('.delete-announcement');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const announcementIndex = button.dataset.announcement;
+                deleteAnnouncement('<%= comp._id %>', announcementIndex);
             });
         });
-    
+        
         // Popup
         let modal = document.getElementById("myModal");
-    
+        
         // Get the button that opens the modal
         let btn = document.getElementById("createQuestionBtn");
-    
+        
         // When the user clicks the button, open the modal 
         btn.onclick = function() {
             modal.style.display = "block";
         };
-    
+        
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
         };
-    
+        
         // Handle click on MCQ option
         document.addEventListener('DOMContentLoaded', function() {
             const mcqOption = document.querySelector('#myModal > div > div > a.right-option');
             mcqOption.addEventListener('click', function(event) {
                 event.preventDefault(); 
-                
+                    
                 const numQuestions = prompt("Please enter the number of questions:", "1");
-
+    
                 // If the user provides a valid number, navigate to the next page with the specified number of questions
                 if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
                     const compId = '<%= comp._id %>';

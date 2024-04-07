@@ -36,10 +36,12 @@ const get_home = (req, res) => {
   }
 };
 
+
 const get_applyhost = (req, res) => {
   const user = req.session.user;
   res.render('competitions/applyhost', { title: 'Apply for Host', user });
 };
+
 
 const post_applyhost = async (req, res) => {
   try {
@@ -65,6 +67,7 @@ const post_applyhost = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 const get_comp = (req, res)=>{
   const user = req.session.user;
@@ -114,7 +117,6 @@ const post_createcomp = async (req, res) => {
 };
 
 
-
 const get_createQuestion = async (req, res) => {
   try {
     const user = req.session.user;
@@ -132,6 +134,7 @@ const get_createQuestion = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 const post_announcement = async (req, res) => {
   try {
@@ -169,6 +172,7 @@ const post_announcement = async (req, res) => {
   }
 };
 
+
 const get_announcement = async (req, res) => {
   try {
     const user = req.session.user;
@@ -197,6 +201,7 @@ const get_announcement = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 const post_comment = async (req, res) => {
   try {
@@ -239,8 +244,10 @@ const post_comment = async (req, res) => {
   }
 };
 
+
 const delete_announcement = async (req, res) => {
   try {
+    const user = req.session.user;
     const compId = req.params.id;
     const announcementIndex = req.params.index;
 
@@ -269,7 +276,6 @@ const delete_announcement = async (req, res) => {
 };
 
 
-
 const delete_comp = (req, res)=>{
   const id = req.params.id;
 
@@ -281,6 +287,34 @@ const delete_comp = (req, res)=>{
       console.log(err);
     });
 };
+
+
+const delete_comment = async (req, res) => {
+  try {
+      const { id, index, commentIndex } = req.params;
+
+      // Find the competition by ID
+      const competition = await Competition.findById(id);
+
+      // Ensure the competition exists and the announcement index is valid
+      if (!competition || index < 0 || index >= competition.announcements.length) {
+          return res.status(404).json({ message: 'Competition or announcement not found' });
+      }
+
+      // Find the announcement and remove the comment
+      const announcement = competition.announcements[index];
+      announcement.comments.splice(commentIndex, 1);
+
+      // Save the updated competition
+      await competition.save();
+
+      res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 
 module.exports = {
   get_home,
@@ -294,5 +328,6 @@ module.exports = {
   delete_announcement,
   get_announcement,
   post_comment,
-  get_createQuestion
+  get_createQuestion,
+  delete_comment
 };

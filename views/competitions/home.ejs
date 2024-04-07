@@ -32,7 +32,7 @@
                         <p>By:</p>
                         <h4><%= comp.hostUsername %></h4>
                     </div>
-                    <% if (user.isAdmin) { %>
+                    <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
                         <form id="deleteForm<%= comp._id %>" style="display:inline;">
                             <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">
                                 <img src="/trashcan.svg" alt="delete icon">

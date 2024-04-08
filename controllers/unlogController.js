@@ -174,7 +174,7 @@ const get_profile = async (req, res) => {
 const post_updateUserProfile = async (req, res) => {
     try {
         // Retrieve user ID from session or request body, depending on your authentication method
-        const userId = req.session.userId; // Assuming you store user ID in session
+        const userId = req.session.user._id; // Assuming the user object in the session contains the user ID
         
         // Retrieve updated information from request body
         const { fullname, username, email, dob } = req.body;

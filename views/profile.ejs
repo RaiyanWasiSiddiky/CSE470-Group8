@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/head.ejs') %>
+
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <h1>User Profile</h1>
+    
+    <div class="user-info">
+        <form id="update-form">
+            <div>
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" value="<%= user.fullname %>" required>
+            </div>
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" value="<%= user.username %>" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="<%= user.email %>" required>
+            </div>
+            <div>
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" value="<%= user.dob.toISOString().slice(0, 10) %>" required>
+            </div>
+            <div>
+                <label for="joiningDate">Joining Date:</label>
+                <input type="text" id="joiningDate" value="<%= user.joiningDate.toDateString() %>" disabled>
+            </div>
+            <div>
+                <label for="hostAuth">Host Authentication:</label>
+                <input type="checkbox" id="hostAuth" <%= user.hostAuth ? 'checked' : '' %> disabled>
+            </div>
+            
+            <!-- Update Button -->
+            <button type="submit">Update</button>
+        </form>
+        
+        <h2>Friends</h2>
+        <% if (user.friends.length > 0) { %>
+            <ul>
+                <% user.friends.forEach(friend => { %>
+                    <li><%= friend.username %></li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No friends yet</p>
+        <% } %>
+    </div>
+
+    <%- include('./partials/footer.ejs') %>
+
+    <script>
+        document.getElementById('update-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Collect updated information from input fields
+            const fullname = document.getElementById('fullname').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const dob = document.getElementById('dob').value;
+
+            // Send an AJAX request to update the user's information
+            fetch('/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fullname,
+                    username,
+                    email,
+                    dob
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update profile');
+                }
+                // Reload the page to reflect the changes
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+                // Handle error, show message, etc.
+            });
+        });
+    </script>
+
+</body>
+</html>

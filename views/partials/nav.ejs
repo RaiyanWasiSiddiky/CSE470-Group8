@@ -10,6 +10,7 @@
             <li><a href="/admins/adminUsers">Users</a></li>
             <li><a href="/admins/authenticate">Authenticate Users</a></li>
         <% } else { %>
+            <li><a href="/profile/<%= user._id %>">Profile</a></li>
             <li><a href="/competitions/home">My Competitions</a></li>
         <% } %>
         <li><a href="/signout">Sign Out</a></li>

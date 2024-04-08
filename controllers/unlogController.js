@@ -147,6 +147,50 @@ const post_resetPassword = async (req, res) => {
 };
 
 
+// Controller function to fetch user data and render the profile page
+const get_profile = async (req, res) => {
+    try {
+        const session_user = req.session.user;
+        // Retrieve the user ID from request parameters
+        const userID = req.params.userID;
+
+        // Find the user by ID in the database
+        const user = await User.findById(userID); //.populate('friends'); // Adjust as needed based on your schema
+
+        if (!user) {
+            // If user not found, send 404 Not Found response
+            return res.status(404).send('User not found');
+        }
+
+        // Render the userProfile.ejs template with the user data
+        res.render('profile', { user, title:"Profile Page" });
+    } catch (error) {
+        // Handle any errors and send a 500 Internal Server Error response
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+const post_updateUserProfile = async (req, res) => {
+    try {
+        // Retrieve user ID from session or request body, depending on your authentication method
+        const userId = req.session.userId; // Assuming you store user ID in session
+        
+        // Retrieve updated information from request body
+        const { fullname, username, email, dob } = req.body;
+
+        // Update the user profile
+        await User.findByIdAndUpdate(userId, { fullname, username, email, dob });
+
+        // Send a success response
+        res.status(200).send('User profile updated successfully');
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
 module.exports = {
     get_index,
     get_login,
@@ -155,5 +199,7 @@ module.exports = {
     get_signout, 
     post_signup,
     post_login,
-    post_resetPassword
+    post_resetPassword,
+    get_profile,
+    post_updateUserProfile
 };

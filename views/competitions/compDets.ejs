@@ -8,7 +8,7 @@
     <div class="details content">
         
         <h2><%= comp.title %></h2>
-        <h4><%= comp.hostUsername %></h4>
+        <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
         <h5>genre: <%= comp.genre %></h5>
         <div class="content">
             <p><%= comp.about %></p>
@@ -36,7 +36,7 @@
         </div>
         
         <!-- Form for posting text content -->
-        <% if (user._id.toString() === comp.host.toString()) { %>
+        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
             <form action="/competitions/<%= comp._id %>" method="POST">
                 <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
                 <button type="submit">Post</button>
@@ -47,7 +47,7 @@
         <div class="announcements">
             <% comp.announcements.forEach((announcement, index) => { %>
                 <div class="announcement">
-                    <h4><%= announcement.createdByUsername %></h4>
+                    <h4><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
                     <a class="single" href="/competitions/<%= comp._id %>/<%= index %>">
                         <p><%= announcement.content %></p>
                     </a>

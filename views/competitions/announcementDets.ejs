@@ -8,7 +8,10 @@
     <div class="announcements content">
         <h2><%= title %></h2>
         <p><%= announcement.content %></p>
-        <h4>by: <%= announcement.createdByUsername %></h4>
+        <div>
+            <p style="display: inline;">by: </p>
+            <h4 style="display: inline;"><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
+        </div>
         <h5>Created at: <%= announcement.createdAt %></h5>
     
         <% if (user.isAdmin || announcement.createdBy.toString() === user._id.toString()) { %>
@@ -25,7 +28,7 @@
             <ul class="comments-list">
                 <% announcement.comments.forEach(function(comment, index) { %>
                     <li>
-                        <p><strong><%= comment.authorUsername %>:</strong> <%= comment.content %></p>
+                        <p><strong><a href="/profile/<%= comment.author._id %>"><%= comment.authorUsername %></a>:</strong> <%= comment.content %></p>
                         <h5>Created at: <%= comment.createdAt %></h5>
 
                         <% if (user.isAdmin || comment.author.toString() === user._id.toString()) { %>

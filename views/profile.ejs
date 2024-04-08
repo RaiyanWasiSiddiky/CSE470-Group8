@@ -11,37 +11,39 @@
         <form id="update-form">
             <div>
                 <label for="fullname">Full Name:</label>
-                <input type="text" id="fullname" value="<%= user.fullname %>" required>
+                <input type="text" id="fullname" value="<%= profileuser.fullname %>" required <%= (user && user._id.toString() === profileuser._id.toString()) ? '' : 'disabled' %>>
             </div>
             <div>
                 <label for="username">Username:</label>
-                <input type="text" id="username" value="<%= user.username %>" required>
+                <input type="text" id="username" value="<%= profileuser.username %>" required <%= (user && user._id.toString() === profileuser._id.toString()) ? '' : 'disabled' %>>
             </div>
             <div>
                 <label for="email">Email:</label>
-                <input type="email" id="email" value="<%= user.email %>" required>
+                <input type="email" id="email" value="<%= profileuser.email %>" required <%= (user && user._id.toString() === profileuser._id.toString()) ? '' : 'disabled' %>>
             </div>
             <div>
                 <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" value="<%= user.dob.toISOString().slice(0, 10) %>" required>
+                <input type="date" id="dob" value="<%= profileuser.dob.toISOString().slice(0, 10) %>" required <%= (user && user._id.toString() === profileuser._id.toString()) ? '' : 'disabled' %>>
             </div>
             <div>
                 <label for="joiningDate">Joining Date:</label>
-                <input type="text" id="joiningDate" value="<%= user.joiningDate.toDateString() %>" disabled>
+                <input type="text" id="joiningDate" value="<%= profileuser.joiningDate.toDateString() %>" disabled>
             </div>
             <div>
                 <label for="hostAuth">Host Authentication:</label>
-                <input type="checkbox" id="hostAuth" <%= user.hostAuth ? 'checked' : '' %> disabled>
+                <input type="checkbox" id="hostAuth" <%= profileuser.hostAuth ? 'checked' : '' %> disabled>
             </div>
             
             <!-- Update Button -->
-            <button type="submit">Update</button>
+            <% if (user && user._id.toString() === profileuser._id.toString()) { %>
+                <button type="submit">Update</button>
+            <% } %>
         </form>
         
         <h2>Friends</h2>
-        <% if (user.friends.length > 0) { %>
+        <% if (profileuser.friends.length > 0) { %>
             <ul>
-                <% user.friends.forEach(friend => { %>
+                <% profileuser.friends.forEach(friend => { %>
                     <li><%= friend.username %></li>
                 <% }); %>
             </ul>
@@ -62,7 +64,6 @@
             const email = document.getElementById('email').value;
             const dob = document.getElementById('dob').value;
 
-            console.log(`${fullname}, ${username}, ${email}, ${dob}`);
 
             // Send an AJAX request to update the user's information
             fetch('/profile/update', {

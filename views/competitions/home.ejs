@@ -30,7 +30,7 @@
                     <p class="genre">Genre: <%= comp.genre %></p>
                     <div class="host announcement-author">
                         <p>By:</p>
-                        <h4><%= comp.hostUsername %></h4>
+                        <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
                     </div>
                     <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
                         <form id="deleteForm<%= comp._id %>" style="display:inline;">

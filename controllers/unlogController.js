@@ -52,7 +52,7 @@ const post_login = async (req, res) => {
         }
 
         // Compare passwords
-        const isPasswordValid = password === authenticatedUser.password;
+        const isPasswordValid = (password === authenticatedUser.password);
 
         if (!isPasswordValid) {
             return res.status(400).json({ error: 'Invalid credentials' });
@@ -150,26 +150,27 @@ const post_resetPassword = async (req, res) => {
 // Controller function to fetch user data and render the profile page
 const get_profile = async (req, res) => {
     try {
-        const session_user = req.session.user;
+        const user = req.session.user;
         // Retrieve the user ID from request parameters
         const userID = req.params.userID;
 
         // Find the user by ID in the database
-        const user = await User.findById(userID); //.populate('friends'); // Adjust as needed based on your schema
+        const profileuser = await User.findById(userID); //.populate('friends'); // Adjust as needed based on your schema
 
-        if (!user) {
+        if (!profileuser) {
             // If user not found, send 404 Not Found response
             return res.status(404).send('User not found');
         }
 
         // Render the userProfile.ejs template with the user data
-        res.render('profile', { user, title:"Profile Page" });
+        res.render('profile', { profileuser, title:"Profile Page",  user });
     } catch (error) {
         // Handle any errors and send a 500 Internal Server Error response
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 const post_updateUserProfile = async (req, res) => {
     try {

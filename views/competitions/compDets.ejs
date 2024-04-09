@@ -8,6 +8,14 @@
     <div class="details content">
         
         <h2><%= comp.title %></h2>
+
+        <% if (!user.isAdmin && user._id.toString() !== comp.host.toString() && !user.competitions.includes(comp._id.toString())) { %>
+            <form action="/competitions/join" method="POST">
+                <input type="hidden" name="compId" value="<%= comp._id %>">
+                <button type="submit" class="btn">Join Competition</button>
+            </form>
+        <% } %>
+
         <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
         <h5>genre: <%= comp.genre %></h5>
         <div class="content">
@@ -36,7 +44,7 @@
         </div>
         
         <!-- Form for posting text content -->
-        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+        <% if (user.isAdmin || user._id.toString() === comp.host.toString() ) { %>
             <form action="/competitions/<%= comp._id %>" method="POST">
                 <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
                 <button type="submit">Post</button>
@@ -44,34 +52,98 @@
         <% } %>
 
         <!-- Display announcements -->
-        <div class="announcements">
-            <% comp.announcements.forEach((announcement, index) => { %>
-                <div class="announcement">
-                    <h4><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
-                    <a class="single" href="/competitions/<%= comp._id %>/<%= index %>">
-                        <p><%= announcement.content %></p>
-                    </a>
+        <% if (user.isAdmin || user._id.toString() === comp.host.toString() || user.competitions.includes(comp._id.toString()) ) { %>
+            <div class="announcements">
+                <% comp.announcements.forEach((announcement, index) => { %>
+                    <div class="announcement">
+                        <h4><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
+                        <a class="single" href="/competitions/<%= comp._id %>/<%= index %>">
+                            <p><%= announcement.content %></p>
+                        </a>
 
-                    <h5 class="date"><%= announcement.createdAt.toLocaleString() %></h5>
-                    <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
-                        <h5>Comments</h5>
-                    </a>
+                        <h5 class="date"><%= announcement.createdAt.toLocaleString() %></h5>
+                        <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
+                            <h5>Comments</h5>
+                        </a>
 
-                    <!-- Show delete button only if isAdmin or user._id === host -->
-                    <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
-                        <button class="delete-announcement" data-announcement="<%= index %>">
-                            Delete
-                        </button>
-                    <% } %>
-                </div>
-            <% }); %>
-        </div>
-
+                        <!-- Show delete button only if isAdmin or user._id === host -->
+                        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+                            <button class="delete-announcement" data-announcement="<%= index %>">
+                                Delete
+                            </button>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <h2>Please join competition to see content</h2>
+        <% } %>
+            
     </div>
 
     <%- include('../partials/footer.ejs') %>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById("myModal");
+    
+            // Check if the modal exists in the DOM
+            if (modal) {
+                // Get the button that opens the modal
+                const btn = document.getElementById("createQuestionBtn");
+                
+                // Check if the button exists before setting onclick
+                if (btn) {
+                    // When the user clicks the button, open the modal 
+                    btn.onclick = function() {
+                        modal.style.display = "block";
+                    };
+                }
+    
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                };
+    
+                // Handle click on MCQ option
+                const mcqOption = document.querySelector('#myModal > div > div > a.right-option');
+                if (mcqOption) {
+                    mcqOption.addEventListener('click', function(event) {
+                        event.preventDefault(); 
+                            
+                        const numQuestions = prompt("Please enter the number of questions:", "1");
+            
+                        // If the user provides a valid number, navigate to the next page with the specified number of questions
+                        if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
+                            const compId = '<%= comp._id %>';
+                            window.location.href = `/competitions/${compId}/createQuestion?type=mcq&numQuestions=${numQuestions}`;
+                        }
+                    });
+                }
+            }
+    
+            // Add event listener for delete buttons
+            const deleteButtons = document.querySelectorAll('.delete-announcement');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const announcementIndex = button.dataset.announcement;
+                    deleteAnnouncement('<%= comp._id %>', announcementIndex);
+                });
+            });
+    
+            // Add event listener for trashcan
+            const trashcan = document.querySelector('a.delete');
+            if (trashcan) {
+                trashcan.addEventListener('click', (e)=>{
+                    const competitionId = trashcan.dataset.doc;
+                    deleteCompetition(competitionId);
+                });
+            }
+        });
+    
+        // Delete competition function
         const deleteCompetition = (competitionId) => {
             if (confirm('Are you sure you want to delete this competition?')) {
                 const endpoint = `/competitions/${competitionId}/delete`;
@@ -94,18 +166,11 @@
             }
         };
     
-        const trashcan = document.querySelector('a.delete');
-        
-        trashcan.addEventListener('click', (e)=>{
-            const competitionId = trashcan.dataset.doc;
-            deleteCompetition(competitionId);
-        });
-
-
+        // Delete announcement function
         const deleteAnnouncement = (competitionId, announcementIndex) => {
             if (confirm('Are you sure you want to delete this announcement?')) {
                 const endpoint = `/competitions/${competitionId}/${announcementIndex}/delete`;
-
+    
                 fetch(endpoint, {
                     method: 'DELETE'
                 })
@@ -123,49 +188,6 @@
                 });
             }
         };
-
-        const deleteButtons = document.querySelectorAll('.delete-announcement');
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const announcementIndex = button.dataset.announcement;
-                deleteAnnouncement('<%= comp._id %>', announcementIndex);
-            });
-        });
-        
-        // Popup
-        let modal = document.getElementById("myModal");
-        
-        // Get the button that opens the modal
-        let btn = document.getElementById("createQuestionBtn");
-        
-        // When the user clicks the button, open the modal 
-        btn.onclick = function() {
-            modal.style.display = "block";
-        };
-        
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        };
-        
-        // Handle click on MCQ option
-        document.addEventListener('DOMContentLoaded', function() {
-            const mcqOption = document.querySelector('#myModal > div > div > a.right-option');
-            mcqOption.addEventListener('click', function(event) {
-                event.preventDefault(); 
-                    
-                const numQuestions = prompt("Please enter the number of questions:", "1");
-    
-                // If the user provides a valid number, navigate to the next page with the specified number of questions
-                if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
-                    const compId = '<%= comp._id %>';
-                    window.location.href = `/competitions/${compId}/createQuestion?type=mcq&numQuestions=${numQuestions}`;
-                }
-            });
-        });
     </script>
 
 </body>

@@ -51,7 +51,11 @@ const userSchema = new Schema({
     isAdmin: {
         type: Boolean,
         default: false
-    }
+    },
+    competitions: [{ 
+        type: Schema.Types.ObjectID,
+        ref: 'Competition'
+    }]
 });
 
 const adminSchema = new Schema({
@@ -171,6 +175,10 @@ const competitionSchema = new Schema({
         ref: 'User',
         required: true
     },
+    participants: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     hostUsername: String, // Add a field to store the username
     judges: [{
         type: Schema.Types.ObjectId,
@@ -180,11 +188,11 @@ const competitionSchema = new Schema({
     questionSets: [questionSetSchema] 
 }, { timestamps: true });
 
-
-const User = mongoose.model('users', userSchema);
-const Admin = mongoose.model('admins', adminSchema);
-const Applicant = mongoose.model('applicants', applicantSchema);
-const Competition = mongoose.model('competitions', competitionSchema);
+// whyyyyyy does mongoose capitalization+pluralization exist man whyyy
+const User = mongoose.model('User', userSchema);
+const Admin = mongoose.model('Admin', adminSchema);
+const Applicant = mongoose.model('Applicant', applicantSchema);
+const Competition = mongoose.model('Competition', competitionSchema);
 
 module.exports = {
     User,

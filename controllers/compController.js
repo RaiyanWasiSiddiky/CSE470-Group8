@@ -91,8 +91,10 @@ const get_createcomp = function(req, res){
 const post_createcomp = async (req, res) => {
   try {
       // Extract competition details from the request body
-      const user = req.session.user;
+      const userId = req.session.user._id;
       const { title, genre, about } = req.body;
+
+      const user = await User.findById(userId);
 
       // Create a new competition instance
       const newCompetition = new Competition({
@@ -108,11 +110,56 @@ const post_createcomp = async (req, res) => {
       // Save the new competition to the database
       await newCompetition.save();
 
+      // Add the comp._id of the newly created competition to the user's competitions array
+      user.competitions.push(newCompetition._id);
+      await user.save();
+
       // Redirect to the home page or display a success message
       res.redirect('/competitions/home');
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+const post_joinCompetition = async (req, res) => {
+  try {
+      const { compId } = req.body;
+      const userId = req.session.user._id;
+      console.log(compId, userId);
+
+      // Update user's competitions array
+      await User.findByIdAndUpdate(userId, { $addToSet: { competitions: compId } });
+
+      // Update competition's participants array
+      await Competition.findByIdAndUpdate(compId, { $addToSet: { participants: userId } });
+
+
+      // cant find a way to fix this for now ig
+      // res.redirect(`/competitions/${compId}`);
+      // res.status(200).json({ message: 'Joined competition successfully' });
+      res.redirect('/login');
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+const get_myComps = async (req, res) => {
+  try {
+      const userID = req.session.user._id;
+      
+      // Fetch user's competitions
+      const user = await User.findById(userID).populate('competitions');
+
+      // console.log(user);
+      
+      res.render('competitions/myComps', { user, title: "My competitions" });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
   }
 };
 
@@ -276,16 +323,38 @@ const delete_announcement = async (req, res) => {
 };
 
 
-const delete_comp = (req, res)=>{
-  const id = req.params.id;
+const delete_comp = async (req, res) => {
+  try {
+    const id = req.params.id;
 
-  Competition.findByIdAndDelete(id)
-    .then(result=>{
-      res.json({ redirect: '/competitions/home'});
-    })
-    .catch(err=>{
-      console.log(err);
+    // Find the competition document to be deleted
+    const deletedCompetition = await Competition.findById(id);
+
+    if (!deletedCompetition) {
+      return res.status(404).json({ error: 'Competition not found' });
+    }
+
+    // Find all users who have the competition ID in their competitions field
+    const usersToUpdate = await User.find({ competitions: id });
+
+    // Remove the competition ID from each user's competitions field
+    const updateUserPromises = usersToUpdate.map(async (user) => {
+      user.competitions = user.competitions.filter(compId => compId.toString() !== id);
+      await user.save();
     });
+
+    // Wait for all users to be updated
+    await Promise.all(updateUserPromises);
+
+    // Delete the competition document
+    await Competition.findByIdAndDelete(id);
+
+    // Send response indicating successful deletion
+    res.json({ redirect: '/competitions/home' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 
@@ -329,5 +398,7 @@ module.exports = {
   get_announcement,
   post_comment,
   get_createQuestion,
-  delete_comment
+  delete_comment,
+  post_joinCompetition,
+  get_myComps
 };

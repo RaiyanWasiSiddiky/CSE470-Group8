@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="competitions-list content">
+        <!-- Add the Create New Competition link here -->
+        <a href="/competitions/createcomp">Create New Competition</a>
+
+        <div class="host-competitions">
+            <h2>Host Competitions</h2>
+            <% if (user.competitions.filter(comp => comp.host.toString() === user._id.toString()).length === 0) { %>
+                <p>No Host Competitions</p>
+            <% } else { %>
+                <% user.competitions.forEach(comp => { %>
+                    <% if (comp.host.toString() === user._id.toString()) { %>
+                        <div class="competition">
+                            <a class="single" href="/competitions/<%= comp._id %>">
+                                <h3 class="title"><%= comp.title %></h3>
+                            </a>
+                            <p class="genre">Genre: <%= comp.genre %></p>
+                            <div class="host announcement-author">
+                                <p>By:</p>
+                                <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+                            </div>
+                            <!-- Add delete button for host competitions -->
+                            <form id="deleteForm<%= comp._id %>" style="display:inline;">
+                                <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">
+                                    <img src="/trashcan.svg" alt="delete icon">
+                                </button>
+                            </form>
+                        </div>
+                    <% } %>
+                <% }); %>
+            <% } %>
+        </div>
+
+        <div class="participating-competitions">
+            <h2>Participating Competitions</h2>
+            <% if (user.competitions.filter(comp => comp.host.toString() !== user._id.toString()).length === 0) { %>
+                <p>No Participating Competitions</p>
+            <% } else { %>
+                <% user.competitions.forEach(comp => { %>
+                    <% if (comp.host.toString() !== user._id.toString()) { %>
+                        <div class="competition">
+                            <a class="single" href="/competitions/<%= comp._id %>">
+                                <h3 class="title"><%= comp.title %></h3>
+                            </a>
+                            <p class="genre">Genre: <%= comp.genre %></p>
+                            <div class="host announcement-author">
+                                <p>By:</p>
+                                <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+        function deleteCompetition(competitionId) {
+            if (confirm('Are you sure you want to delete this competition?')) {
+                fetch(`/competitions/${competitionId}/delete`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page or update the UI as needed
+                        location.reload();
+                    } else {
+                        // Handle errors
+                        console.error('Error deleting competition');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

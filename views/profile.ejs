@@ -5,7 +5,24 @@
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <h1>User Profile</h1>
+    <h1><%= profileuser.username %> Profile</h1>
+
+    <% if (user && user._id.toString() !== profileuser._id.toString()) { %>
+        <% if (!user.follows.includes(profileuser._id.toString())) { %>
+            <% if (user.followers.includes(profileuser._id.toString())) { %>
+                <form action="/follow/<%= profileuser._id %>" method="POST">
+                    <button type="submit" class="follow-link">Follow back</button>
+                </form>
+            <% } else { %>
+                <form action="/follow/<%= profileuser._id %>" method="POST">
+                    <button type="submit" class="follow-link">Follow</button>
+                </form>
+            <% } %>
+        <% } else { %>
+            <span class="already-following">Already following</span>
+        <% } %>
+    <% } %>
+    
     
     <div class="user-info">
         <form id="update-form">
@@ -40,15 +57,22 @@
             <% } %>
         </form>
         
-        <h2>Friends</h2>
-        <% if (profileuser.friends.length > 0) { %>
+        <h2>Hosted Competitions</h2>
+        <% if (profileuser.competitions.length > 0) { %>
             <ul>
-                <% profileuser.friends.forEach(friend => { %>
-                    <li><%= friend.username %></li>
+                <% profileuser.competitions.forEach(competition => { %>
+                    <% if (competition.host.toString() === profileuser._id.toString()) { %>
+                        <div class="competition">
+                            <a class="single" href="/competitions/<%= competition._id %>">
+                                <h3 class="title"><%= competition.title %></h3>
+                            </a>
+                            <p class="genre">Genre: <%= competition.genre %></p>
+                        </div>
+                    <% } %>
                 <% }); %>
             </ul>
         <% } else { %>
-            <p>No friends yet</p>
+            <p>No hosted competitions yet</p>
         <% } %>
     </div>
 

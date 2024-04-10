@@ -14,6 +14,7 @@ const get_adminUsers =  async (req, res) => {
     }
   };
 
+
 const get_authenticate = async (req, res) => {
   try {
       // Fetch all applications from the database
@@ -51,6 +52,7 @@ const post_acceptApplicant = async (req, res) => {
   }
 };
 
+
 const post_rejectApplicant = async (req, res) => {
   try {
     const applicantID = req.body.applicantID;
@@ -83,10 +85,10 @@ const delete_user = async (req, res) => {
 };
 
 
-  module.exports = {
-    get_adminUsers,
-    delete_user,
-    get_authenticate,
-    post_acceptApplicant,
-    post_rejectApplicant
-  };
+module.exports = {
+  get_adminUsers,
+  delete_user,
+  get_authenticate,
+  post_acceptApplicant,
+  post_rejectApplicant
+};

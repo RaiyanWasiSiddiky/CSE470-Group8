@@ -38,6 +38,10 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     }],
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }],
     securityQuestion: {
         question: {
             type: String,
@@ -72,6 +76,18 @@ const userSchema = new Schema({
         content: {
             type: String,
             required: true
+        }
+    }],
+    notifications: [{
+        type: {
+            type: String
+        },
+        content: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
         }
     }]
 });

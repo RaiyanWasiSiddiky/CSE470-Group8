@@ -73,6 +73,7 @@ const get_comp = (req, res)=>{
   const user = req.session.user;
   const id = req.params.id;
   Competition.findById(id)
+    .populate("participants")
     .then((result) => {
       res.render('competitions/compDets', { comp: result, title: result.title, user:user});
     })

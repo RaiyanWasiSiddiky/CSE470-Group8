@@ -4,14 +4,17 @@ const get_index = (req, res)=>{
     res.render('index', {title: 'Welcome'});
   };
   
+
 const get_login = (req, res)=>{
     res.render('login', {title: 'Login'});
   };
   
+
 const get_signup = (req, res)=>{
     res.render('signup', {title: 'signup'});
   };
   
+
 const get_forgotpass = (req, res)=>{
     res.render('forgotpass', {title: 'Reset Password'});
   };
@@ -29,6 +32,7 @@ const get_signout = (req, res) => {
         }
     });
 };
+
 
 const post_login = async (req, res) => {
     try {
@@ -125,10 +129,10 @@ const post_resetPassword = async (req, res) => {
         }
 
         // Check if the provided security question and answer match
-        console.log(user.securityQuestion.question);
-        console.log(user.securityQuestion.answer);
-        console.log(securityquestion);
-        console.log(securityanswer);
+        // console.log(user.securityQuestion.question);
+        // console.log(user.securityQuestion.answer);
+        // console.log(securityquestion);
+        // console.log(securityanswer);
         if (user.securityQuestion.question !== securityquestion || user.securityQuestion.answer !== securityanswer) {
             return res.status(400).json({ error: 'Incorrect security question or answer' });
         }
@@ -156,10 +160,12 @@ const get_profile = async (req, res) => {
     try {
         const user = req.session.user;
         // Retrieve the user ID from request parameters
-        const userID = req.params.userID;
+        const userID = req.params.userId;
 
-        // Find the user by ID in the database
-        const profileuser = await User.findById(userID); //.populate('friends'); // Adjust as needed based on your schema
+        // Find the user by ID in the database and populate the 'competitions' field
+        const profileuser = await User.findById(userID).populate('competitions');
+
+        console.log(profileuser);
 
         if (!profileuser) {
             // If user not found, send 404 Not Found response
@@ -167,7 +173,7 @@ const get_profile = async (req, res) => {
         }
 
         // Render the userProfile.ejs template with the user data
-        res.render('profile', { profileuser, title:"Profile Page",  user });
+        res.render('profile', { profileuser, title:"Profile Page", user });
     } catch (error) {
         // Handle any errors and send a 500 Internal Server Error response
         console.error(error);
@@ -196,6 +202,78 @@ const post_updateUserProfile = async (req, res) => {
 };
 
 
+const post_follow = async (req, res) => {
+    const { userID } = req.params;
+    const currentUserID = req.session.user._id; // Assuming the user ID is stored in session
+
+    try {
+        // Find the current user and the user to follow
+        const currentUser = await User.findById(currentUserID);
+        const userToFollow = await User.findById(userID);
+
+        if (!currentUser || !userToFollow) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Add the user to follow to the current user's follows array
+        currentUser.follows.push(userID);
+        await currentUser.save();
+
+        // Add the current user to the user to follow's followers array
+        userToFollow.followers.push(currentUserID);
+        await userToFollow.save();
+
+        res.status(200).json({ message: 'User followed successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+const get_followers =  async (req, res) => {
+    const user = req.session.user;
+    const userId = req.params.userId;
+
+    const user1 = await User.findById(userId)
+      .populate("follows")
+      .populate("followers");
+
+    // Render the followers.ejs page and pass the user object to it
+    res.render('followers', { user, user1, title:"{user1.username}'s Followers" });
+};
+
+
+const post_unfollow = async (req, res) => {
+    try {
+        const userIdToUnfollow = req.params.userId;
+
+        // Find the current user
+        const currentUser = await User.findById(req.session.user._id);
+
+        // Find the user to unfollow
+        const userToUnfollow = await User.findById(userIdToUnfollow);
+
+        if (!currentUser || !userToUnfollow) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Remove userToUnfollow from currentUser's follows array
+        currentUser.follows = currentUser.follows.filter(userId => userId.toString() !== userIdToUnfollow);
+        await currentUser.save();
+
+        // Remove currentUser from userToUnfollow's followers array
+        userToUnfollow.followers = userToUnfollow.followers.filter(userId => userId.toString() !== currentUser._id.toString());
+        await userToUnfollow.save();
+
+        res.redirect(`/followers/${req.session.user._id}`); // Redirect to the followers page
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 module.exports = {
     get_index,
     get_login,
@@ -206,5 +284,8 @@ module.exports = {
     post_login,
     post_resetPassword,
     get_profile,
-    post_updateUserProfile
+    post_updateUserProfile,
+    post_follow,
+    get_followers,
+    post_unfollow
 };

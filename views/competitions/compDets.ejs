@@ -29,6 +29,14 @@
             </a>
         <% } %>
 
+        <h2>Participants</h2>
+        <ul>
+            <% comp.participants.forEach(participant => { %>
+                <li><a href="/profile/<%= participant._id %>"><%= participant.username %></a></li>
+            <% }); %>
+        </ul>
+
+
         <% if (user._id.toString() === comp.host.toString()) { %>
             <button id="createQuestionBtn" class="btn">Create Question Set</button>
         <% } %>

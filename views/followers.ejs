@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/head.ejs') %>
+<body>
+
+    <%- include('./partials/nav.ejs') %>
+
+    <div class="followers content">
+        <h2>Followers</h2>
+        <ul>
+            <% user1.followers.forEach(follower => { %>
+                <li><a href="/profile/<%= follower._id %>"><%= follower.username %></a></li>
+            <% }); %>
+        </ul>
+
+        <h2>Follows</h2>
+        <ul>
+            <% user1.follows.forEach(follow => { %>
+                <li>
+                    <a href="/profile/<%= follow._id %>"><%= follow.username %></a>
+                    <form action="/unfollow/<%= follow._id %>" method="POST">
+                        <button type="submit">Unfollow</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+
+    <%- include('./partials/footer.ejs') %>
+
+</body>
+</html>

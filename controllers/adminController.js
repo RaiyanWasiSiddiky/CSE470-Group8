@@ -96,6 +96,35 @@ const delete_user = async (req, res) => {
     }
 };
 
+// same as above but added logic that all competitions hosted by user are also deleted
+// const delete_user = async (req, res) => {
+//   const userId = req.params.id;
+
+//   try {
+//       // Find the user by ID and populate the 'competitions' field
+//       const user = await User.findById(userId).populate('competitions');
+      
+//       if (!user) {
+//           return res.status(404).send('User not found');
+//       }
+
+//       // Delete competitions hosted by the user
+//       for (const competition of user.competitions) {
+//           if (competition.host.toString() === userId) {
+//               await Competition.findByIdAndDelete(competition._id);
+//           }
+//       }
+
+//       // Delete the user
+//       await User.findByIdAndDelete(userId);
+      
+//       // Redirect to the all users page or any other appropriate page
+//       res.redirect('/admins/adminUsers');
+//   } catch (error) {
+//       console.error(error);
+//       res.status(500).send('Internal Server Error');
+//   }
+// };
 
 module.exports = {
   get_adminUsers,

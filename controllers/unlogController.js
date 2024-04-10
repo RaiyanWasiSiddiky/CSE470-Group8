@@ -94,10 +94,10 @@ const post_signup = async (req, res) => {
             email,
             password,
             dob,
-            securityQuestions: [{
+            securityQuestion: {
                 question: securityquestion,
                 answer: securityanswer
-            }]
+            }
         });
 
         // Save the new user to the database
@@ -114,7 +114,7 @@ const post_signup = async (req, res) => {
 
 const post_resetPassword = async (req, res) => {
     try {
-        const { email, security_question, security_answer, firsttry, secondtry } = req.body;
+        const { email, securityquestion, securityanswer, firsttry, secondtry } = req.body;
 
         // Find the user by email
         const user = await User.findOne({ email });
@@ -125,7 +125,11 @@ const post_resetPassword = async (req, res) => {
         }
 
         // Check if the provided security question and answer match
-        if (user.securityQuestion !== security_question || user.securityAnswer !== security_answer) {
+        console.log(user.securityQuestion.question);
+        console.log(user.securityQuestion.answer);
+        console.log(securityquestion);
+        console.log(securityanswer);
+        if (user.securityQuestion.question !== securityquestion || user.securityQuestion.answer !== securityanswer) {
             return res.status(400).json({ error: 'Incorrect security question or answer' });
         }
 

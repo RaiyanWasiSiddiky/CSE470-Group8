@@ -34,11 +34,11 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    friends: [{
-        type: Schema.Types.ObjectID,
+    follows: [{
+        type: Schema.Types.ObjectId,
         ref: "User"
     }],
-    securityQuestions: [{
+    securityQuestion: {
         question: {
             type: String,
             required: true
@@ -47,14 +47,32 @@ const userSchema = new Schema({
             type: String,
             required: true
         }
-    }],
+    },
     isAdmin: {
         type: Boolean,
         default: false
     },
     competitions: [{ 
-        type: Schema.Types.ObjectID,
+        type: Schema.Types.ObjectId,
         ref: 'Competition'
+    }],
+    rating: {
+        type: Number,
+        default: 0
+    },
+    reviews: [{
+        reviewerId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        reviewerUsername: {
+            type: String,
+            required: true
+        },
+        content: {
+            type: String,
+            required: true
+        }
     }]
 });
 

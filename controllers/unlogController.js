@@ -1,4 +1,5 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
+const timeutils = require('../time.js');
 
 const get_index = (req, res)=>{
     res.render('index', {title: 'Welcome'});
@@ -221,6 +222,15 @@ const post_follow = async (req, res) => {
 
         // Add the current user to the user to follow's followers array
         userToFollow.followers.push(currentUserID);
+
+        // Create a notification for the user being followed
+        const notification = {
+            type: 'follow',
+            content: `${currentUser.username} has followed you`,
+            createdAt: Date.now() // Set the current date and time
+        };
+        userToFollow.notifications.push(notification);
+
         await userToFollow.save();
 
         res.status(200).json({ message: 'User followed successfully' });
@@ -240,7 +250,7 @@ const get_followers =  async (req, res) => {
       .populate("followers");
 
     // Render the followers.ejs page and pass the user object to it
-    res.render('followers', { user, user1, title:"{user1.username}'s Followers" });
+    res.render('followers', { user, user1, title:`${user1.username}'s Followers` });
 };
 
 
@@ -264,12 +274,42 @@ const post_unfollow = async (req, res) => {
 
         // Remove currentUser from userToUnfollow's followers array
         userToUnfollow.followers = userToUnfollow.followers.filter(userId => userId.toString() !== currentUser._id.toString());
+
+        // Create a notification for the user being unfollowed
+        const notification = {
+            type: 'unfollow',
+            content: `${currentUser.username} has unfollowed you`,
+            createdAt: Date.now() // Set the current date and time
+        };
+        userToUnfollow.notifications.push(notification);
+
         await userToUnfollow.save();
 
         res.redirect(`/followers/${req.session.user._id}`); // Redirect to the followers page
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+const get_notifications = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        // Find the user by ID in the database and populate the 'notifications' field
+        const user = await User.findById(userId);
+        if (!user) {
+            // If user not found, send 404 Not Found response
+            return res.status(404).send('User not found');
+        }
+        // Sort notifications by createdAt in descending order (latest first)
+        user.notifications.sort((a, b) => b.createdAt - a.createdAt);
+        // Render the notifications.ejs template with the user object and getTimeSince function
+        res.render('notifications', { user, getTimeSince: timeutils.getTimeSince, title: `${user.username}'s notifications` });
+    } catch (error) {
+        // Handle any errors and send a 500 Internal Server Error response
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -287,5 +327,6 @@ module.exports = {
     post_updateUserProfile,
     post_follow,
     get_followers,
-    post_unfollow
+    post_unfollow,
+    get_notifications
 };

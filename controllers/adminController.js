@@ -44,6 +44,10 @@ const post_acceptApplicant = async (req, res) => {
     // Delete the applicant from the collection
     await Applicant.deleteOne({ _id: applicantID });
 
+    // Create a notification for the user
+    const notificationContent = 'Your request for host Authentication has been approved';
+    await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
+
     // Redirect back to the authenticate page after accepting
     res.redirect('/admins/authenticate');
   } catch (error) {
@@ -57,8 +61,16 @@ const post_rejectApplicant = async (req, res) => {
   try {
     const applicantID = req.body.applicantID;
 
+    // Retrieve the user associated with the applicant
+    const applicant = await Applicant.findById(applicantID);
+    const userId = applicant.user;
+
     // Delete the applicant from the collection
     await Applicant.deleteOne({ _id: applicantID });
+
+    // Create a notification for the user
+    const notificationContent = 'Your request for host Authentication has been rejected';
+    await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
 
     // Redirect back to the authenticate page after rejecting
     res.redirect('/admins/authenticate');

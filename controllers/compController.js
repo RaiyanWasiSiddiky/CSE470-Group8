@@ -128,18 +128,23 @@ const post_joinCompetition = async (req, res) => {
   try {
       const { compId } = req.body;
       const userId = req.session.user._id;
-      console.log(compId, userId);
-
+      
       // Update user's competitions array
       await User.findByIdAndUpdate(userId, { $addToSet: { competitions: compId } });
 
       // Update competition's participants array
       await Competition.findByIdAndUpdate(compId, { $addToSet: { participants: userId } });
 
+      // Get the competition details including the host
+      const competition = await Competition.findById(compId).populate('host');
 
-      // cant find a way to fix this for now ig
-      // res.redirect(`/competitions/${compId}`);
-      // res.status(200).json({ message: 'Joined competition successfully' });
+      // Create notification content
+      const notificationContent = `${req.session.user.username} has joined ${competition.title}`;
+
+      // Update host's notifications
+      await User.findByIdAndUpdate(competition.host._id, { $push: { notifications: { type: 'join', content: notificationContent, createdAt: Date.now() } } });
+
+      // Redirect to the appropriate page or send a response
       res.redirect('/login');
   } catch (error) {
       console.error(error);
@@ -210,6 +215,14 @@ const post_announcement = async (req, res) => {
 
     // Save the updated competition document
     await competition.save();
+
+    // Create notification content
+    const notificationContent = `There is a new announcement in ${competition.title}`;
+
+    // Update notifications for all participants
+    for (const participantId of competition.participants) {
+      await User.findByIdAndUpdate(participantId, { $push: { notifications: { type: 'announcement', content: notificationContent, createdAt: new Date() } } });
+    }
 
     // Redirect back to the same page after posting announcement
     res.redirect(`/competitions/${compId}`);

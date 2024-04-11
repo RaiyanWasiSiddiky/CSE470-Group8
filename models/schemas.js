@@ -204,6 +204,10 @@ const competitionSchema = new Schema({
         type: String,
         required: true
     },
+    finished: {
+        type: Boolean,
+        default: false
+    },
     host: {
         type: Schema.Types.ObjectId,
         ref: 'User',

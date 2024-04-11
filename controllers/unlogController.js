@@ -1,5 +1,5 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
-const timeutils = require('../time.js');
+const timeutils = require('../timeutensils.js');
 
 const get_index = (req, res)=>{
     res.render('index', {title: 'Welcome'});
@@ -110,6 +110,7 @@ const post_signup = async (req, res) => {
 
         // Redirect the user to the login page after successful signup
         res.redirect('/login');
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
@@ -166,7 +167,7 @@ const get_profile = async (req, res) => {
         // Find the user by ID in the database and populate the 'competitions' field
         const profileuser = await User.findById(userID).populate('competitions');
 
-        console.log(profileuser);
+        // console.log(profileuser);
 
         if (!profileuser) {
             // If user not found, send 404 Not Found response
@@ -233,7 +234,10 @@ const post_follow = async (req, res) => {
 
         await userToFollow.save();
 
-        res.status(200).json({ message: 'User followed successfully' });
+        // res.status(200).json({ message: 'User followed successfully' });
+        // res.redirect(`/followers/${currentUserID}`);
+        res.redirect('/login');
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
@@ -285,7 +289,9 @@ const post_unfollow = async (req, res) => {
 
         await userToUnfollow.save();
 
-        res.redirect(`/followers/${req.session.user._id}`); // Redirect to the followers page
+        // res.redirect(`/followers/${req.session.user._id}`); // Redirect to the followers page
+        res.redirect('/login');
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });

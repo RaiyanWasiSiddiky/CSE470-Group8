@@ -12,7 +12,7 @@
             <p style="display: inline;">by: </p>
             <h4 style="display: inline;"><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
         </div>
-        <h5>Created at: <%= announcement.createdAt %></h5>
+        <h5>Created at: <%= getTimeSince(announcement.createdAt) %></h5>
     
         <% if (user.isAdmin || announcement.createdBy.toString() === user._id.toString()) { %>
             <button class="delete-btn" data-id="<%= comp._id %>" data-index="<%= announcementIndex %>">Delete</button>
@@ -29,7 +29,7 @@
                 <% announcement.comments.forEach(function(comment, index) { %>
                     <li>
                         <p><strong><a href="/profile/<%= comment.author._id %>"><%= comment.authorUsername %></a>:</strong> <%= comment.content %></p>
-                        <h5>Created at: <%= comment.createdAt %></h5>
+                        <h5>Created at: <%= getTimeSince(comment.createdAt) %></h5>
 
                         <% if (user.isAdmin || comment.author.toString() === user._id.toString()) { %>
                             <button class="delete-comment-btn" data-compid="<%= comp._id %>" data-announcementindex="<%= announcementIndex %>" data-commentindex="<%= index %>">Delete</button>

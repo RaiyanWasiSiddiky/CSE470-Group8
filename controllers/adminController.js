@@ -8,9 +8,10 @@ const get_adminUsers =  async (req, res) => {
   
       // Render a page to display the list of users
       res.render('admins/adminUsers', { title: "All Users", users: users, user });
+      
     } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal server error' });
     }
   };
 
@@ -23,9 +24,10 @@ const get_authenticate = async (req, res) => {
 
       // Render the applications page with the retrieved applications data
       res.render('admins/authenticate', { title: "Applicants", applicants, user });
+
   } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -49,10 +51,12 @@ const post_acceptApplicant = async (req, res) => {
     await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
 
     // Redirect back to the authenticate page after accepting
-    res.redirect('/admins/authenticate');
+    res.redirect(`/admins/authenticate`);
+    // res.json({ redirect: `/admins/authenticate` })
+ 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -73,10 +77,12 @@ const post_rejectApplicant = async (req, res) => {
     await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
 
     // Redirect back to the authenticate page after rejecting
-    res.redirect('/admins/authenticate');
+    // res.json({ redirect: `/admins/authenticate` })
+    res.redirect(`/admins/authenticate`);
+
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -89,10 +95,12 @@ const delete_user = async (req, res) => {
         await User.findByIdAndDelete(userId);
         
         // Redirect to the all users page or any other appropriate page
-        res.redirect('/admins/adminUsers');
+        // res.json({ redirect: `/admins/adminUsers` })
+        res.redirect(`/admins/adminUsers`);
+
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 

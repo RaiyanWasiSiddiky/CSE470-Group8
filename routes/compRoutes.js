@@ -14,6 +14,7 @@ router.post('/applyhost', compController.post_applyhost);
 router.post('/home', compController.post_createcomp);
 router.post('/join', compController.post_joinCompetition);
 router.post('/:id', compController.post_announcement);
+router.post('/:competitionId/end', compController.post_endCompetition);
 router.post('/:id/:index', compController.post_comment);
 
 router.delete('/:id/delete', compController.delete_comp);

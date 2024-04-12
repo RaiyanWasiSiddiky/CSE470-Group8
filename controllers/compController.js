@@ -110,9 +110,9 @@ const post_createcomp = async (req, res) => {
         about,
         host: user._id,
         hostUsername: user.username,
-        // Add the creator's user ID as a default judge
-        judges: [user._id], // Assuming user ID is available in req.user
     });
+
+    newCompetition.judges.push({ user: user._id, status: 'accepted' });
 
     // Save the new competition to the database
     await newCompetition.save();
@@ -317,6 +317,43 @@ const post_comment = async (req, res) => {
 };
 
 
+const post_endCompetition = async (req, res) => {
+  const competitionId = req.params.competitionId;
+  const userId = req.session.user._id;
+
+  try {
+      const competition = await Competition.findById(competitionId);
+      if (!competition) {
+        res.status(404).render('404', { title: "Competition not found" });
+      }
+
+      competition.finished = true;
+      await competition.save();
+
+      const user = await User.findById(userId);
+
+      // Create new announcement
+      const announcement = {
+        content: `${competition.title} has ended.`,
+        createdBy: user._id, // Assuming user is logged in and you have access to session
+        createdByUsername: user.username, // Assuming user is logged in and you have access to session
+        createdAt: new Date()
+      };
+
+      // Add the announcement to the competition
+      competition.announcements.push(announcement);
+      await competition.save();
+
+      // Redirect the user to the competition page
+      res.redirect(`/competitions/${competitionId}`);
+
+  } catch (error) {
+      console.error('Error ending competition:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 const delete_announcement = async (req, res) => {
   try {
     const user = req.session.user;
@@ -429,5 +466,6 @@ module.exports = {
   get_createQuestion,
   delete_comment,
   post_joinCompetition,
-  get_myComps
+  get_myComps,
+  post_endCompetition
 };

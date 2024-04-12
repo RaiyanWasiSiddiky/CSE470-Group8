@@ -16,6 +16,10 @@
             </form>
         <% } %>
 
+        <% if ((user.isAdmin || user._id.toString() === comp.host.toString()) && !comp.finished) { %>
+            <button id="endCompetitionBtn" class="btn">End Competition</button>
+        <% } %>
+
         <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
         <h5>genre: <%= comp.genre %></h5>
         <div class="content">
@@ -131,6 +135,7 @@
                     });
                 }
             }
+
     
             // Add event listener for delete buttons
             const deleteButtons = document.querySelectorAll('.delete-announcement');
@@ -148,8 +153,40 @@
                     const competitionId = trashcan.dataset.doc;
                     deleteCompetition(competitionId);
                 });
-            }
+            };
+
+
+            // Add event listener for ending competition
+            const endCompetitionBtn = document.getElementById("endCompetitionBtn");
+            if (endCompetitionBtn) {
+                endCompetitionBtn.addEventListener('click', () => {
+                    endCompetition('<%= comp._id %>');
+                });
+            };
         });
+
+        // Function to end competition
+        const endCompetition = (competitionId) => {
+            if (confirm('Are you sure you want to end this competition?')) {
+                const endpoint = `/competitions/${competitionId}/end`;
+    
+                fetch(endpoint, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page or update the UI as needed
+                        window.location.reload();
+                    } else {
+                        // Handle errors
+                        console.error('Error ending competition');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        };
     
         // Delete competition function
         const deleteCompetition = (competitionId) => {

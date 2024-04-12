@@ -219,8 +219,14 @@ const competitionSchema = new Schema({
     }],
     hostUsername: String, // Add a field to store the username
     judges: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        status: {
+            type: String,
+            default: 'pending'
+        }
     }],
     announcements: [announcementSchema], 
     questionSets: [questionSetSchema] 

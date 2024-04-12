@@ -8,26 +8,54 @@
     <div class="details content">
         
         <h2><%= comp.title %></h2>
+        <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+        <h5>Host Rating: <%= comp.host.avgRating %></h5>
+        <h5>genre: <%= comp.genre %></h5>
+        <div class="content">
+            <p><%= comp.about %></p>
+        </div>
 
-        <% if (!user.isAdmin && user._id.toString() !== comp.host.toString() && !user.competitions.includes(comp._id.toString())) { %>
+        <% if (comp.finished) { %>
+            <% let userParticipant = false; %>
+            <% comp.participants.forEach(participant => { %>
+                <% if (participant._id.toString() === user._id.toString()) { %>
+                    <% userParticipant = true; %>
+                <% } %>
+            <% }); %>
+            <% if (userParticipant) { %>
+                <button id="rateButton" class="btn">Rate and Review Competition Host</button>
+            <% } %>
+        <% } %>
+        
+        <!-- Popup modal for rating and reviewing competition host -->
+        <div id="rateModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Rate and Review Competition Host</h2>
+                <form id="ratingForm">
+                    <label for="rating">Rating:</label>
+                    <input type="number" id="rating" name="rating" min="1" max="5" required>
+                    <label for="review">Review:</label>
+                    <textarea id="review" name="review" rows="4" cols="50" placeholder="Write your review here..." required></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+
+        <% if (!user.isAdmin && user._id.toString() !== comp.host._id.toString() && !user.competitions.includes(comp._id.toString()) && !comp.finished) { %>
             <form action="/competitions/join" method="POST">
                 <input type="hidden" name="compId" value="<%= comp._id %>">
                 <button type="submit" class="btn">Join Competition</button>
             </form>
         <% } %>
 
-        <% if ((user.isAdmin || user._id.toString() === comp.host.toString()) && !comp.finished) { %>
+        <% if ((user.isAdmin || user._id.toString() === comp.host._id.toString()) && !comp.finished) { %>
             <button id="endCompetitionBtn" class="btn">End Competition</button>
         <% } %>
 
-        <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
-        <h5>genre: <%= comp.genre %></h5>
-        <div class="content">
-            <p><%= comp.about %></p>
-        </div>
-
         <!-- Show delete button only if isAdmin or user._id === host -->
-        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+        <% if (user.isAdmin || user._id.toString() === comp.host._id.toString()) { %>
             <a class="delete" data-doc="<%= comp._id %>">
                 <img src="/trashcan.svg" alt="delete icon">
             </a>
@@ -41,7 +69,7 @@
         </ul>
 
 
-        <% if (user._id.toString() === comp.host.toString()) { %>
+        <% if (user._id.toString() === comp.host._id.toString()) { %>
             <button id="createQuestionBtn" class="btn">Create Question Set</button>
         <% } %>
 
@@ -56,7 +84,7 @@
         </div>
         
         <!-- Form for posting text content -->
-        <% if (user.isAdmin || user._id.toString() === comp.host.toString() ) { %>
+        <% if (user.isAdmin || user._id.toString() === comp.host._id.toString() ) { %>
             <form action="/competitions/<%= comp._id %>" method="POST">
                 <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
                 <button type="submit">Post</button>
@@ -64,7 +92,7 @@
         <% } %>
 
         <!-- Display announcements -->
-        <% if (user.isAdmin || user._id.toString() === comp.host.toString() || user.competitions.includes(comp._id.toString()) ) { %>
+        <% if (user.isAdmin || user._id.toString() === comp.host._id.toString() || user.competitions.includes(comp._id.toString()) ) { %>
             <div class="announcements">
                 <% comp.announcements.forEach((announcement, index) => { %>
                     <div class="announcement">
@@ -79,7 +107,7 @@
                         </a>
 
                         <!-- Show delete button only if isAdmin or user._id === host -->
-                        <% if (user.isAdmin || user._id.toString() === comp.host.toString()) { %>
+                        <% if (user.isAdmin || user._id.toString() === comp.host._id.toString()) { %>
                             <button class="delete-announcement" data-announcement="<%= index %>">
                                 Delete
                             </button>
@@ -163,7 +191,44 @@
                     endCompetition('<%= comp._id %>');
                 });
             };
+
+            // Add event listener for rating and reviewing competition host
+            const rateButton = document.getElementById("rateButton");
+            if (rateButton) {
+                rateButton.addEventListener('click', () => {
+                    // Open the rating modal
+                    const rateModal = document.getElementById("rateModal");
+                    rateModal.style.display = "block";
+
+                    // Close the modal when the user clicks on the close button
+                    const closeButton = document.querySelector("#rateModal .close");
+                    closeButton.addEventListener('click', () => {
+                        rateModal.style.display = "none";
+                    });
+
+                    // Close the modal when the user clicks anywhere outside of it
+                    window.onclick = function(event) {
+                        if (event.target == rateModal) {
+                            rateModal.style.display = "none";
+                        }
+                    };
+
+                    // Handle form submission
+                    const ratingForm = document.getElementById("ratingForm");
+                    ratingForm.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        const rating = document.getElementById("rating").value;
+                        const review = document.getElementById("review").value;
+                        // Handle rating and review submission
+                        submitRatingAndReview('<%= comp.host._id %>', rating, review);
+                        // Close the modal
+                        rateModal.style.display = "none";
+                    });
+                });
+            }
+
         });
+
 
         // Function to end competition
         const endCompetition = (competitionId) => {
@@ -232,6 +297,32 @@
                     console.error('Error:', error);
                 });
             }
+        };
+
+        // Function to submit rating and review
+        const submitRatingAndReview = (hostId, rating, review) => {
+            // Send the data to the server via fetch or another method
+            // Example fetch request:
+            const endpoint = `/competitions/rate/${hostId}`;
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ rating: rating, review: review })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Handle success response
+                    console.log('Rating and review submitted successfully');
+                } else {
+                    // Handle error response
+                    console.error('Error submitting rating and review');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         };
     </script>
 

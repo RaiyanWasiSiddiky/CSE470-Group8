@@ -29,6 +29,11 @@
         </div>
     <% } else { %>
         <h1>User is not authorized to create competition</h1>
+        <% if (!user.isAdmin && !user.hostAuth) { %>
+            <div class="apply-for-host">
+                <a href="/competitions/applyhost" class="btn">Apply for Host</a>
+            </div>
+        <% } %>
     <% } %>
 
     <%- include('../partials/footer.ejs') %>

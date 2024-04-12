@@ -60,7 +60,7 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Competition'
     }],
-    rating: {
+    avgRating: {
         type: Number,
         default: 0
     },
@@ -76,6 +76,9 @@ const userSchema = new Schema({
         content: {
             type: String,
             required: true
+        },
+        rating: {
+            type: Number
         }
     }],
     notifications: [{

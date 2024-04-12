@@ -6,6 +6,7 @@
     <%- include('./partials/nav.ejs') %>
 
     <h1><%= profileuser.username %> Profile</h1>
+    <h4>Average Rating: <%= profileuser.avgRating %></h4>
 
     <% if (user && user._id.toString() !== profileuser._id.toString()) { %>
         <% if (!user.follows.includes(profileuser._id.toString())) { %>
@@ -56,6 +57,17 @@
                 <button type="submit">Update</button>
             <% } %>
         </form>
+
+        <h2>User Reviews</h2>
+        <ul>
+            <% profileuser.reviews.forEach(review => { %>
+                <li>
+                    <p><strong>Reviewer:</strong> <%= review.reviewerUsername %></p>
+                    <p><strong>Rating:</strong> <%= review.rating %></p>
+                    <p><strong>Content:</strong> <%= review.content %></p>
+                </li>
+            <% }); %>
+        </ul>
         
         <h2>Hosted Competitions</h2>
         <% if (profileuser.competitions.length > 0) { %>

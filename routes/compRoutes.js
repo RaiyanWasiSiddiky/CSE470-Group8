@@ -13,6 +13,7 @@ router.get('/:id/:index', compController.get_announcement);
 router.post('/applyhost', compController.post_applyhost);
 router.post('/home', compController.post_createcomp);
 router.post('/join', compController.post_joinCompetition);
+router.post('/rate/:hostId', compController.post_rate);
 router.post('/:id', compController.post_announcement);
 router.post('/:competitionId/end', compController.post_endCompetition);
 router.post('/:id/:index', compController.post_comment);

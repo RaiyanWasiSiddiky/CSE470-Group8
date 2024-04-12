@@ -23,18 +23,19 @@ const get_home = (req, res) => {
       console.error(err);
       res.status(500).json({ error: 'Internal server error' });
     });
-} else {
-  // If there is no search query, fetch all competitions
-  Competition.find()
-  .sort({ createdAt: -1 })
-  .then((result) => {
-      res.render('competitions/home', { title: "All Competitions", comps: result, user: user });
-  })
-  .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
-  });
-}
+  } else {
+    // If there is no search query, fetch all competitions
+    Competition.find()
+    .populate("host")
+    .sort({ createdAt: -1 })
+    .then((result) => {
+        res.render('competitions/home', { title: "All Competitions", comps: result, user: user });
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    });
+  }
 };
 
 
@@ -77,6 +78,7 @@ const get_comp = (req, res) => {
   const id = req.params.id;
   Competition.findById(id)
     .populate("participants")
+    .populate("host")
     .then((result) => {
       // Sort announcements in descending order based on createdAt field
       result.announcements.sort((a, b) => b.createdAt - a.createdAt);
@@ -354,6 +356,47 @@ const post_endCompetition = async (req, res) => {
 };
 
 
+const post_rate = async (req, res) => {
+  const { hostId } = req.params;
+  const { rating, review } = req.body;
+  const currentUserId = req.session.user._id;
+
+  try {
+      // Find the host and the current user by their IDs
+      const host = await User.findById(hostId);
+      const currentUser = await User.findById(currentUserId);
+
+      // Check if the host and current user exist
+      if (!host || !currentUser) {
+          return res.status(404).render('404', { title: 'User not found' });
+      }
+
+      // Add the rating and review to the host's reviews array
+      host.reviews.push({
+          reviewerId: currentUser._id,
+          reviewerUsername: currentUser.username,
+          content: review,
+          rating: rating
+      });
+
+      // Calculate the new average rating
+      const totalRatings = host.reviews.reduce((total, review) => total + review.rating, 0);
+      const avgRating = totalRatings / host.reviews.length;
+      host.avgRating = avgRating;
+
+      // Save the updated host document
+      await host.save();
+
+      // Send a success response
+      res.status(200).json({ message: 'Rating and review submitted successfully' });
+  } catch (error) {
+      // Handle errors
+      console.error('Error submitting rating and review:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 const delete_announcement = async (req, res) => {
   try {
     const user = req.session.user;
@@ -467,5 +510,6 @@ module.exports = {
   delete_comment,
   post_joinCompetition,
   get_myComps,
-  post_endCompetition
+  post_endCompetition,
+  post_rate
 };

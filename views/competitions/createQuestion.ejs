@@ -24,6 +24,15 @@
                 <% } %>
                 <button type="submit">Submit</button>
             </form>
+        <% } else { %>
+            <form action="/submitShort" method="POST">
+                <% for (let i = 0; i < numQuestions; i++) { %>
+                    <label for="question<%= i + 1 %>">Question <%= i + 1 %>:</label>
+                    <input type="text" name="question<%= i + 1 %>" required>
+                    <br>
+                <% } %>
+                <button type="submit">Submit</button>
+            </form>
         <% } %>
     </div>
 

@@ -302,8 +302,11 @@ const post_unfollow = async (req, res) => {
 const get_notifications = async (req, res) => {
     try {
         const userId = req.params.userId;
-        // Find the user by ID in the database and populate the 'notifications' field
-        const user = await User.findById(userId);
+        // Find the user by ID in the database and populate the 'notifications.comp' field
+        const user = await User.findById(userId).populate({
+            path: 'notifications',
+            populate: { path: 'comp' }
+        });
         if (!user) {
             // If user not found, send 404 Not Found response
             return res.status(404).send('User not found');

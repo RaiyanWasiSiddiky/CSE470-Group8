@@ -9,7 +9,17 @@
         <h2>Notifications</h2>
         <ul>
             <% user.notifications.forEach(notification => { %>
-                <li><%= notification.content %> - <%= getTimeSince(notification.createdAt) %></li>
+                <li>
+                    <%= notification.content %> - <%= getTimeSince(notification.createdAt) %>
+                    <% if (notification.type === "judge request") { %>
+                        <form action="/competitions/<%= notification.comp._id %>/judgeAccept" method="POST">
+                            <button type="submit" class="accept-button">Accept</button>
+                        </form>
+                        <form action="/competitions/<%= notification.comp._id %>/judgeReject" method="POST">
+                            <button type="submit" class="reject-button">Reject</button>
+                        </form>
+                    <% } %>
+                </li>
             <% }); %>
         </ul>
     </div>

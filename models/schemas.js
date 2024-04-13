@@ -91,6 +91,11 @@ const userSchema = new Schema({
         createdAt: {
             type: Date,
             default: Date.now
+        },
+        comp: {
+            type: Schema.Types.ObjectId,
+            ref: "Competition",
+            default: null // Set default value to null
         }
     }]
 });
@@ -226,6 +231,7 @@ const competitionSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
+        judgeName: String,
         status: {
             type: String,
             default: 'pending'

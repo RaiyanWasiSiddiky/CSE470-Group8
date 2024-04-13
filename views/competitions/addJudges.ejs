@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="content">
+        <h2>Add Judges</h2>
+        <div class="followers-list">
+            <% followers.forEach(follower => { %>
+                <div class="follower">
+                    <span><%= follower.username %></span>
+                    <form action="/competitions/<%= compId %>/addJudge/<%= follower._id %>" method="POST">
+                        <button type="submit" class="add-button">Add</button>
+                    </form>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+</body>
+</html>

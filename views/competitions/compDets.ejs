@@ -68,6 +68,21 @@
             <% }); %>
         </ul>
 
+        <h2>Judges</h2>
+        <ul>
+            <% comp.judges.forEach(judge => { %>
+                <% if (judge.status === "accepted") { %>
+                    <li><a href="/profile/<%= judge.user._id %>"><%= judge.user.username %></a></li>
+                <% } %>
+            <% }); %>
+        </ul>
+
+        
+        <!-- Button for adding judges (visible only to hosts) -->
+        <% if (user._id.toString() === comp.host._id.toString()) { %>
+            <a href="/competitions/<%= comp._id %>/addjudges" class="btn">Add Judges</a>
+        <% } %>
+
 
         <% if (user._id.toString() === comp.host._id.toString()) { %>
             <button id="createQuestionBtn" class="btn">Create Question Set</button>
@@ -76,7 +91,7 @@
         <div id="myModal" class="modal">
             <div class="modal-content">
               <div class="options">
-                <a href="/competitions/<%= comp._id %>/createQuestion?type=submission" class="left-option">Submission</a>
+                <a href="#" onclick="createQuestionSubmission('<%= comp._id %>')" class="left-option">Submission</a>
                 <div class="line"></div>
                 <a href="/competitions/<%= comp._id %>/createQuestion?type=mcq" class="right-option">MCQ</a>
               </div>
@@ -324,6 +339,31 @@
                 console.error('Error:', error);
             });
         };
+
+        function createQuestionSubmission(compId) {
+            const endpoint = `/competitions/${compId}/createQuestionSubmission`;
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ /* Add any payload data if needed */ })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Handle success response
+                    console.log('Question submission created successfully');
+                    // Optionally, close the modal or perform any other action
+                } else {
+                    // Handle error response
+                    console.error('Error creating question submission');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 
 </body>

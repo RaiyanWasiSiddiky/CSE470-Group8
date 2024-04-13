@@ -1,5 +1,6 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
 const timeutils = require('../timeutensils.js');
+const { ObjectId } = require('mongoose').Types;
 
 const get_home = (req, res) => {
   const user = req.session.user;
@@ -79,6 +80,10 @@ const get_comp = (req, res) => {
   Competition.findById(id)
     .populate("participants")
     .populate("host")
+    .populate({
+      path: "judges",
+      populate: { path: "user" } 
+      })
     .then((result) => {
       // Sort announcements in descending order based on createdAt field
       result.announcements.sort((a, b) => b.createdAt - a.createdAt);
@@ -114,7 +119,7 @@ const post_createcomp = async (req, res) => {
         hostUsername: user.username,
     });
 
-    newCompetition.judges.push({ user: user._id, status: 'accepted' });
+    newCompetition.judges.push({ user: user._id, judgeName: user.username,  status: 'accepted' });
 
     // Save the new competition to the database
     await newCompetition.save();
@@ -494,6 +499,181 @@ const delete_comment = async (req, res) => {
 };
 
 
+const get_addJudge = async (req, res) => {
+  try {
+    const user = req.session.user;
+    const compId = req.params.compId;
+    const competition = await Competition.findById(compId);
+    if (!competition) {
+      res.status(404).render('404', { title: "Competition not found" });
+    }
+    
+    // Get followers who are also followed by the current user and are not judges of the competition
+    const followers = await User.find({
+      $and: [
+        { _id: { $in: user.followers } },
+        { _id: { $in: user.follows } },
+        { _id: { $nin: competition.judges.map(judge => judge.user) } }
+      ]
+    });
+
+    res.render('competitions/addJudges', { title: `${competition.title} - Add Judges`, followers, compId, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+const post_requestJudge = async (req, res) => {
+  try {
+    const { compId, userId } = req.params;
+
+    // Find the competition
+    const competition = await Competition.findById(compId).populate('host');
+    if (!competition) {
+      res.status(404).render('404', { title: "Competition not found" });
+    }
+
+    // Check if the user is already a judge
+    if (competition.judges.some(judge => judge.user.equals(userId))) {
+      return res.status(400).json({ error: "User is already a judge" });
+    }
+
+    // Find the user being requested to be a judge
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).render('404', { title: "User not found" });
+    }
+
+    // Add the user as a judge with status "pending"
+    competition.judges.push({ user: userId, judgeName: user.username, status: "pending" });
+    await competition.save();
+
+    // Create a notification for the user
+    const notificationContent = `${competition.host.username} has requested you to judge ${competition.title}`;
+    user.notifications.push({
+      type: "judge request",
+      content: notificationContent,
+      comp: competition._id
+    });
+    await user.save();
+
+    res.status(200).json({ message: "Judge request sent successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+const post_judgeAccept = async (req, res) => {
+  try {
+    const compId = req.params.compId;
+    const user = await User.findById(req.session.user._id);
+
+    if (!user) {
+      return res.status(404).render('404', { title: "User not found" });
+    }
+
+    // Find the competition
+    const competition = await Competition.findById(compId).populate('host');
+    if (!competition) {
+      return res.status(404).render('404', { title: "Competition not found" });
+    }
+
+    const notification = user.notifications.find(notification => {
+      return notification.comp && notification.comp.toString()===compId && notification.type === "judge request";
+    });
+
+    if (!notification) {
+      return res.status(404).render('404', { title: "Notification not found" });
+    }
+
+    // Update the notification type to "accept judge"
+    notification.type = "accept judge";
+
+    // Save the modified user object
+    await user.save();
+
+    // console.log(competition.judges);
+
+    // Create a notification for the competition host
+    const notificationContent = `${user.username} has accepted to judge ${competition.title}`;
+    competition.host.notifications.push({
+      type: "accept judge",
+      content: notificationContent
+    });
+
+    // Save the modified competition object
+    await competition.host.save();
+
+    // Update the status of the judge to "accepted"
+    const judgeIndex = competition.judges.findIndex(judge => judge.user.toString() === user._id.toString());
+    if (judgeIndex !== -1) {
+      competition.judges[judgeIndex].status = "accepted";
+    }
+
+    // Save the modified competition object
+    await competition.save();
+
+    res.status(200).json({ message: "Judge request accepted successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+// POST route handler to reject the judge request
+const post_judgeReject = async (req, res) => {
+  try {
+    const compId = req.params.compId;
+    const user = await User.findById(req.session.user._id);
+
+    if (!user) {
+      return res.status(404).render('404', { title: "User not found" });
+    }
+
+    // Find the competition
+    const competition = await Competition.findById(compId).populate("host");
+    if (!competition) {
+      return res.status(404).render('404', { title: "Competition not found" });
+    }
+
+    // Find the notification corresponding to the judge request
+    const notification = user.notifications.find(notification => {
+      return notification.comp && notification.comp.toString()===compId && notification.type === "judge request";
+    });
+    if (!notification) {
+      return res.status(404).render('404', { title: "Notification not found" });
+    }
+
+    // Update the notification type to "reject judge"
+    notification.type = "reject judge";
+    await user.save();
+
+    // Create a notification for the competition host
+    const notificationContent = `${user.username} has rejected to judge ${competition.title}`;
+    competition.host.notifications.push({
+      type: "reject judge",
+      content: notificationContent
+    });
+    await competition.host.save();
+
+    // Remove the judge from the competition
+    competition.judges = competition.judges.filter(judge => !(judge.user.toString()===user._id.toString()));
+    await competition.save();
+
+    res.status(200).json({ message: "Judge request rejected successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 module.exports = {
   get_home,
   get_comp,
@@ -511,5 +691,9 @@ module.exports = {
   post_joinCompetition,
   get_myComps,
   post_endCompetition,
-  post_rate
+  post_rate,
+  get_addJudge,
+  post_requestJudge,
+  post_judgeAccept,
+  post_judgeReject
 };

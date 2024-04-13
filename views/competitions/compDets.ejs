@@ -11,6 +11,7 @@
         <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
         <h5>Host Rating: <%= comp.host.avgRating %></h5>
         <h5>genre: <%= comp.genre %></h5>
+        <h3>About <%= comp.title %></h3>
         <div class="content">
             <p><%= comp.about %></p>
         </div>
@@ -77,7 +78,7 @@
             <% }); %>
         </ul>
 
-        
+
         <!-- Button for adding judges (visible only to hosts) -->
         <% if (user._id.toString() === comp.host._id.toString()) { %>
             <a href="/competitions/<%= comp._id %>/addjudges" class="btn">Add Judges</a>
@@ -90,16 +91,22 @@
 
         <div id="myModal" class="modal">
             <div class="modal-content">
-              <div class="options">
-                <a href="#" onclick="createQuestionSubmission('<%= comp._id %>')" class="left-option">Submission</a>
-                <div class="line"></div>
-                <a href="/competitions/<%= comp._id %>/createQuestion?type=mcq" class="right-option">MCQ</a>
-              </div>
+                <div class="options">
+                    <a href="#" onclick="createQuestionSubmission('<%= comp._id %>')" class="left-option">Submission</a>
+                    <div class="line"></div>
+                    <form id="questionTypeForm" class="right-option">
+                        <select id="questionType">
+                            <option value="mcq">MCQ</option>
+                            <option value="short">Short Question</option>
+                        </select>
+                        <button type="submit">Select</button>
+                    </form>
+                </div>
             </div>
         </div>
         
         <!-- Form for posting text content -->
-        <% if (user.isAdmin || user._id.toString() === comp.host._id.toString() ) { %>
+        <% if (user.isAdmin || comp.judges.some(judge => judge.user._id.toString() === user._id.toString())) { %>
             <form action="/competitions/<%= comp._id %>" method="POST">
                 <textarea name="text_content" rows="2" cols="50" placeholder="Post Announcement..." required></textarea>
                 <button type="submit">Post</button>
@@ -107,6 +114,7 @@
         <% } %>
 
         <!-- Display announcements -->
+        <h2>Announcements</h2>
         <% if (user.isAdmin || user._id.toString() === comp.host._id.toString() || user.competitions.includes(comp._id.toString()) ) { %>
             <div class="announcements">
                 <% comp.announcements.forEach((announcement, index) => { %>
@@ -141,39 +149,53 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById("myModal");
-    
+
             // Check if the modal exists in the DOM
             if (modal) {
                 // Get the button that opens the modal
                 const btn = document.getElementById("createQuestionBtn");
-                
+
                 // Check if the button exists before setting onclick
                 if (btn) {
                     // When the user clicks the button, open the modal 
-                    btn.onclick = function() {
+                    btn.onclick = function () {
                         modal.style.display = "block";
                     };
                 }
-    
+
                 // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function(event) {
+                window.onclick = function (event) {
                     if (event.target == modal) {
                         modal.style.display = "none";
                     }
                 };
-    
-                // Handle click on MCQ option
-                const mcqOption = document.querySelector('#myModal > div > div > a.right-option');
-                if (mcqOption) {
-                    mcqOption.addEventListener('click', function(event) {
-                        event.preventDefault(); 
-                            
-                        const numQuestions = prompt("Please enter the number of questions:", "1");
-            
-                        // If the user provides a valid number, navigate to the next page with the specified number of questions
-                        if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
-                            const compId = '<%= comp._id %>';
-                            window.location.href = `/competitions/${compId}/createQuestion?type=mcq&numQuestions=${numQuestions}`;
+
+                // Handle submission of question type form
+                const questionTypeForm = document.getElementById('questionTypeForm');
+                if (questionTypeForm) {
+                    questionTypeForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+
+                        // Get the selected question type
+                        const selectedType = document.getElementById('questionType').value;
+
+                        // Proceed based on the selected type
+                        if (selectedType === 'mcq') {
+                            const numQuestions = prompt("Please enter the number of MCQ questions:", "1");
+
+                            // If the user provides a valid number, navigate to the next page with the specified number of MCQ questions
+                            if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
+                                const compId = '<%= comp._id %>';
+                                window.location.href = `/competitions/${compId}/createQuestion?type=mcq&numQuestions=${numQuestions}`;
+                            }
+                        } else if (selectedType === 'short') {
+                            const numQuestions = prompt("Please enter the number of Short Questions:", "1");
+
+                            // If the user provides a valid number, navigate to the next page with the specified number of Short Questions
+                            if (numQuestions !== null && !isNaN(numQuestions) && numQuestions > 0) {
+                                const compId = '<%= comp._id %>';
+                                window.location.href = `/competitions/${compId}/createQuestion?type=short&numQuestions=${numQuestions}`;
+                            }
                         }
                     });
                 }

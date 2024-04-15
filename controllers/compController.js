@@ -356,7 +356,7 @@ const get_announcement = async (req, res) => {
     const announcement = competition.announcements[announcementIndex];
 
     // Render the announcement_details view with the announcement data
-    res.render('competitions/announcementDets', { comp: competition, getTimeSince: timeutils.getTimeSince, title: competition.title, announcement, announcementIndex, user:user });
+    res.render('competitions/announcementDets', { comp: competition, getTimeSince: timeutils.getTimeSince, getTimeLeft: timeutils.getTimeLeft, title: competition.title, announcement, announcementIndex, user:user });
 
   } catch (error) {
     console.error(error);

@@ -203,6 +203,10 @@ const announcementSchema = new Schema({
             answers: [String],
             correctAnswer: String
         }],
+        submittedUsers: [{  
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],
         submissions: [{
             user: {
                 type: Schema.Types.ObjectId,

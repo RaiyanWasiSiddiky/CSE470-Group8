@@ -7,13 +7,31 @@
 
     <div class="announcements content">
         <h3><%= title %></h3>
-        <p><%= announcement.content %></p>
+        <% if (announcement.type === "question") { %>
+            <h4><%= announcement.content %></h4>
+        <% } else {%>
+            <p><%= announcement.content %></p>
+        <% } %>
         <div>
             <p style="display: inline;">by: </p>
             <h4 style="display: inline;"><a href="/profile/<%= announcement.createdBy._id %>"><%= announcement.createdByUsername %></a></h4>
         </div>
+        <% if (announcement.type === "question") { %>
+            <h4 class="date blue-text"> Time Left: <%= getTimeLeft(announcement.questionSet.deadline) %></h4>
+        <% } %>
         <h5>Created at: <%= getTimeSince(announcement.createdAt) %></h5>
-    
+
+        <% if (announcement.type === "question") { %>
+            <% if (getTimeLeft(announcement.questionSet.deadline) === "Time Over") { %>
+                <h2>The deadline has been passed, you can no longer make submissions</h2>
+            <% } else if (announcement.questionSet.submittedUsers.includes(user._id)) { %>
+                <h2>You have already submitted</h2>
+            <% } else { %>
+                <h2><a href="competitions/<%= comp._id %>/<%= announcementIndex %>/answerQuestion">Answer Question</a></h2>
+            <% } %>
+        <% } %>
+
+        <br>
         <% if (user.isAdmin || announcement.createdBy.toString() === user._id.toString()) { %>
             <button class="delete-btn" data-id="<%= comp._id %>" data-index="<%= announcementIndex %>">Delete</button>
         <% } %>

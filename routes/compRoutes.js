@@ -10,6 +10,7 @@ router.get('/:id', compController.get_comp);
 router.get('/:compId/addjudges', compController.get_addJudge);
 router.get('/:id/createQuestion', compController.get_createQuestion);
 router.get('/:id/:index', compController.get_announcement);
+// router.get('/:compId/:announcementIndex/answerQuestion', compController.get_answerQuestion);
 
 router.post('/applyhost', compController.post_applyhost);
 router.post('/home', compController.post_createcomp);

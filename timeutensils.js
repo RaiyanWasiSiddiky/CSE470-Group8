@@ -34,6 +34,10 @@ module.exports = {
         const deadlineDate = new Date(deadline);
         const timeLeft = deadlineDate - now;
     
+        if (timeLeft <= 0) {
+            return "Time Over";
+        }
+    
         const yearsLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24 * 365));
         const monthsLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
         const daysLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));

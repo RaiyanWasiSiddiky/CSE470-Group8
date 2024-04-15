@@ -125,3 +125,7 @@ footer{
 .announcement-author p {
   margin-right: 5px; /* Add some spacing between "by:" and the username */
 }
+
+.blue-text {
+  color: blue;
+}

@@ -9,7 +9,7 @@
         <h2>Notifications</h2>
         <ul>
             <% user.notifications.forEach(notification => { %>
-                <li>
+                <li<% if (notification.type === 'question' || notification.type === 'announcement' || notification.type === 'judge request') { %> style="color: red;"<% } %>>
                     <%= notification.content %> - <%= getTimeSince(notification.createdAt) %>
                     <% if (notification.type === "judge request") { %>
                         <form action="/competitions/<%= notification.comp._id %>/judgeAccept" method="POST">

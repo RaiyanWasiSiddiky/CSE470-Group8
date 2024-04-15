@@ -1,7 +1,6 @@
 const express=  require('express');
 const session = require('express-session');
 const morgan = require('morgan');
-const multer = require('multer');
 const mongoose = require('mongoose');
 const compRoutes = require('./routes/compRoutes');
 const adminRoutes = require('./routes/adminRoutes');

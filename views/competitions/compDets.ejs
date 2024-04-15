@@ -92,7 +92,7 @@
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <div class="options">
-                    <a href="#" onclick="createQuestionSubmission('<%= comp._id %>')" class="left-option">Submission</a>
+                    <a href="/competitions/<%= comp._id %>/createQuestion?type=submission" class="left-option">Submission</a>
                     <div class="line"></div>
                     <form id="questionTypeForm" class="right-option">
                         <select id="questionType">
@@ -128,6 +128,10 @@
                         <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
                             <h5>Comments</h5>
                         </a>
+
+                        <% if (announcement.type === "question") { %>
+                            <h5 class="date"> <%= getTimeLeft(announcement.questionSet.deadline) %></h5>
+                        <% } %>
 
                         <!-- Show delete button only if isAdmin or user._id === host -->
                         <% if (user.isAdmin || user._id.toString() === comp.host._id.toString()) { %>
@@ -362,30 +366,6 @@
             });
         };
 
-        function createQuestionSubmission(compId) {
-            const endpoint = `/competitions/${compId}/createQuestionSubmission`;
-
-            fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ /* Add any payload data if needed */ })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Handle success response
-                    console.log('Question submission created successfully');
-                    // Optionally, close the modal or perform any other action
-                } else {
-                    // Handle error response
-                    console.error('Error creating question submission');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
     </script>
 
 </body>

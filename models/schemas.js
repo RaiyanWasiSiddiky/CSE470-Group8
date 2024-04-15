@@ -170,6 +170,10 @@ const commentSchema = new Schema({
 });
 
 const announcementSchema = new Schema({
+    type: {
+        type: String,
+        default: "announcement"
+    },
     content: {
         type: String,
         required: true
@@ -183,21 +187,36 @@ const announcementSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    comments: [commentSchema] 
-});
-
-const questionSetSchema = new Schema({
-    questions: [String], 
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    createdByUsername: String, // Add a field to store the username
-    createdAt: {
-        type: Date,
-        default: Date.now
+    comments: [commentSchema], 
+    questionSet: {
+        title: {
+            type: String
+        },
+        deadline: {
+            type: Date
+        },
+        type: {
+            type: String
+        },
+        questions: [{
+            question: String,
+            answers: [String],
+            correctAnswer: String
+        }],
+        submissions: [{
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            file: String, // Store the path to the uploaded file
+            uploadedAt: {
+                type: Date,
+                default: Date.now
+            }
+        }],
     }
 });
+
 
 const competitionSchema = new Schema({
     title: {
@@ -225,6 +244,13 @@ const competitionSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
     }],
+    scores: [{
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        score: Number, 
+    }],
     hostUsername: String, // Add a field to store the username
     judges: [{
         user: {
@@ -237,8 +263,7 @@ const competitionSchema = new Schema({
             default: 'pending'
         }
     }],
-    announcements: [announcementSchema], 
-    questionSets: [questionSetSchema] 
+    announcements: [announcementSchema]
 }, { timestamps: true });
 
 // whyyyyyy does mongoose capitalization+pluralization exist man whyyy

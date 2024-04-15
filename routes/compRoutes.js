@@ -19,6 +19,7 @@ router.post('/:id', compController.post_announcement);
 router.post('/:competitionId/end', compController.post_endCompetition);
 router.post('/:compId/judgeAccept', compController.post_judgeAccept);
 router.post('/:compId/judgeReject', compController.post_judgeReject);
+router.post('/:compId/createQuestion', compController.post_createQuestion);
 router.post('/:id/:index', compController.post_comment);
 router.post('/:compId/addJudge/:userId', compController.post_requestJudge);
 

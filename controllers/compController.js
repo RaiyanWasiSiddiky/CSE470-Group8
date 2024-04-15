@@ -83,11 +83,11 @@ const get_comp = (req, res) => {
     .populate({
       path: "judges",
       populate: { path: "user" } 
-      })
+    })
     .then((result) => {
       // Sort announcements in descending order based on createdAt field
-      result.announcements.sort((a, b) => b.createdAt - a.createdAt);
-      res.render('competitions/compDets', { comp: result, getTimeSince: timeutils.getTimeSince, title: result.title, user: user });
+      // result.announcements.sort((a, b) => b.createdAt - a.createdAt);
+      res.render('competitions/compDets', { comp: result, getTimeSince: timeutils.getTimeSince, getTimeLeft: timeutils.getTimeLeft, title: result.title, user: user });
     })
     .catch((err) => {
       console.log(err);
@@ -199,6 +199,90 @@ const get_createQuestion = async (req, res) => {
     }
     res.render('competitions/createQuestion', { compId, title: competition.title, numQuestions, type, user:user });
   
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+const post_createQuestion = async (req, res) => {
+  try {
+    const { questionTitle, deadline, type } = req.body;
+    let questions = [];
+
+    // If the type is submission, short, or mcq, add questions from request body
+    if (type === 'submission') {
+      questions.push({
+        question: req.body.submissionQuestion,
+        answers: null,
+        correctAnswer: null
+      });
+    } else if (type === 'short') {
+      for (let i = 1; i <= req.body.numQuestions; i++) {
+        const question = req.body[`question${i}`];
+        questions.push({
+          question: question,
+          answers: null,
+          correctAnswer: null
+        });
+      }
+    } else if (type === 'mcq') {
+      // If the type is short or mcq, construct questions array from request body
+      for (let i = 1; i <= req.body.numQuestions; i++) {
+        const question = req.body[`question${i}`];
+        const answers = [
+          req.body[`answer1${i}`],
+          req.body[`answer2${i}`],
+          req.body[`answer3${i}`],
+          req.body[`answer4${i}`]
+        ]
+        const correctAnswer = req.body[`correctAnswer${i}`] 
+        questions.push({
+          question: question,
+          answers: answers,
+          correctAnswer: correctAnswer
+        });
+      }
+    }
+
+    // console.log(questions);
+
+    // Create the question set
+    const questionSet = {
+      title: questionTitle,
+      deadline: deadline,
+      type: type,
+      questions: questions
+    };
+
+    // Create the announcement
+    const newannouncement = {
+      type: 'question',
+      content: questionTitle,
+      createdBy: req.session.user._id,
+      createdByUsername: req.session.user.username,
+      questionSet: questionSet
+    };
+
+    const competition = await Competition.findById(req.params.compId);
+
+    // Push the announcement into the competition schema
+    await Competition.findByIdAndUpdate(req.params.compId, {
+      $push: { announcements: newannouncement },
+    });
+
+    // Create notification content
+    const notificationContent = `There is a new Question Set in ${competition.title}`;
+
+    // Update notifications for all participants
+    for (const participantId of competition.participants) {
+      await User.findByIdAndUpdate(participantId, { $push: { notifications: { type: 'question', content: notificationContent, createdAt: new Date() } } });
+    }
+
+    // Redirect back to the same page after posting announcement
+    res.redirect(`/competitions/${req.params.compId}`);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -695,5 +779,6 @@ module.exports = {
   get_addJudge,
   post_requestJudge,
   post_judgeAccept,
-  post_judgeReject
+  post_judgeReject,
+  post_createQuestion
 };

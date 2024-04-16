@@ -1,15 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
-</head>
+<%- include('../partials/head.ejs') %>
 <body>
-    <h1>Upload Submission</h1>
-    <form action="/submit" method="POST" enctype="multipart/form-data">
-        <input type="file" name="submissionFile" accept=".txt, .pdf, .doc, .docx">
-        <button type="submit">Upload</button>
-    </form>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="answer content">
+        <h3><%= questionSet.title %></h3>
+
+        <% if (questionSet.type === 'submission') { %>
+            <!-- Display question -->
+            <p><strong>Question:</strong> <%= questionSet.questions[0].question %></p>
+            <!-- File upload -->
+            <form action="/submitAnswer" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <button type="submit">Submit</button>
+            </form>
+        <% } else if (questionSet.type === 'short') { %>
+            <!-- Display questions and text areas for each -->
+            <% questionSet.questions.forEach((question, index) => { %>
+                <p><strong>Question <%= index+1 %>:</strong> <%= question.question %></p>
+                <textarea name="answer<%= index + 1 %>" rows="4" cols="50" required></textarea>
+            <% }); %>
+            <!-- Submit button -->
+            <button type="submit">Submit</button>
+        <% } else if (questionSet.type === 'mcq') { %>
+            <!-- Iterate over each question -->
+            <% questionSet.questions.forEach((question, questionIndex) => { %>
+                <!-- Display question -->
+                <p><strong>Question <%= questionIndex + 1 %>:</strong> <%= question.question %></p>
+                <!-- Iterate over each answer for the current question -->
+                <% question.answers.forEach((answer, answerIndex) => { %>
+                    <input type="radio" id="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>" name="answer<%= questionIndex + 1 %>" value="<%= answer %>" required>
+                    <label for="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>"><%= answer %></label><br>
+                <% }); %>
+            <% }); %>
+            <!-- Submit button -->
+            <button type="submit">Submit</button>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
 </body>
 </html>

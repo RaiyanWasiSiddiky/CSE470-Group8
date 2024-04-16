@@ -757,6 +757,21 @@ const post_judgeReject = async (req, res) => {
   }
 };
 
+const get_answerQuestion = async (req, res) => {
+  // Extract competition ID and announcement index from request parameters
+  const { compId, announcementIndex } = req.params;
+  const user = req.session.user;
+
+  const competition = await Competition.findById(compId);
+
+  const announcement = competition.announcements[parseInt(announcementIndex)];
+
+  const questionSet = announcement.questionSet;
+
+  
+  // Render the answer.ejs page with necessary data
+  res.render('competitions/answer', { compId, announcementIndex, questionSet, user, title: `Answering ${questionSet.title}`});
+};
 
 module.exports = {
   get_home,
@@ -780,5 +795,6 @@ module.exports = {
   post_requestJudge,
   post_judgeAccept,
   post_judgeReject,
-  post_createQuestion
+  post_createQuestion,
+  get_answerQuestion
 };

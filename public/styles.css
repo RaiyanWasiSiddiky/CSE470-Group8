@@ -1,49 +1,63 @@
-.container {
-  background: linear-gradient(to bottom, #ffbf80, #ff8c00); /* Gradient background from lighter to darker orange-gold */
-  border-radius: 20px; /* Rounded corners */
-  padding: 20px; /* Add some padding */
-  margin: 120px auto 0; /* Center the container vertically and horizontally */
-  max-width: 400px; /* Limit the width of the container */
-  text-align: center; /* Center the content inside the container */
-}
-.header {
-  font-size: 2em;
-  text-align: center; 
-  margin-top: 50px;
-  font-family: 'Roboto', sans-serif;
+body {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+  font-family: 'Noto Serif', serif;
+  background-image: url('banners.jpg'); /* Add background image */
+  background-size: cover; /* Cover the entire background */
+  background-position: center; /* Center the background image */
 }
 
-.button-container {
-  text-align: center;
-}
-/* Define the initial styles for the button */
-.glow-button {
-  background-color: transparent;
-  border: 2px solid #007bff; /* Blue border */
-  color: #007bff; /* Blue text color */
-  padding: 10px 20px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  cursor: pointer;
-  outline: none;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for background-color and box-shadow */
-  position: relative; /* Set position to relative */
-  z-index: 1; /* Ensure button appears above background */
+p, h1, h2, h3, a, ul{
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: gold;
 }
 
-/* Define the hover effect for the button */
-.glow-button:hover {
-  background-color: rgba(0, 123, 255, 0.3); /* Blue hue with alpha (transparency) */
-  box-shadow: 0 0 80px rgba(0, 123, 255, 0.7); /* Larger and more intense blue shadow */
+/* nav & footer styles */
+nav{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 60px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  text-transform: uppercase;
 }
-
-.about {
-  margin-top: 80px;
-  font-family: 'Roboto', sans-serif;
+nav ul{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
-
+nav li{
+  list-style-type: none;
+  margin-left: 20px;
+}
+nav h1{
+  font-size: 3em;
+}
+nav p, nav a{
+  color: goldenrod;
+  font-weight: 300;
+}
 footer{
-  margin-top: 50px;
+  color: goldenrod;
+  text-align: center;
+  margin: 80px auto 20px;
+}
+h2{
+  margin-bottom: 40px;
+}
+h3{
+  text-transform: capitalize;
+  margin-bottom: 8px;
+}
+.content{
+  margin-left: 20px;
+}
+
+.nav-home{
+  font-family: 'Brush Script MT', cursive;
 }
 
 .modal {
@@ -96,26 +110,6 @@ footer{
     justify-content: center; /* Center the content horizontally */
     align-items: center; /* Center the content vertically */
   }
-
-  .not-found {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-size: 2rem;
-    color: #6c757d;
-}
-
-.not-found::before {
-    content: 'OOPS, ';
-    font-size: 3rem;
-    color: #dc3545;
-}
-
-.not-found::after {
-    content: 'page not found :(';
-    font-size: 1.5rem;
-}
 
 .announcement-author {
   display: flex; /* Use flexbox to arrange items horizontally */

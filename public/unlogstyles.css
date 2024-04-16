@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family:'Times New Roman', Times, serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
@@ -7,10 +7,19 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-image: url('trophy.jpg'); /* Add background image */
+    background-size: cover; /* Cover the entire background */
+    background-position: center; /* Center the background image */
+    color: whitesmoke;
   }
 
+
+  .form-floating {
+    color: black; /* Set placeholder color to black */
+}
+
   .form-container {
-    background-color: #ffffff;
+    background-color: indigo;
     padding-left: 20px;
     padding-right: 30px;
     border-radius: 8px;
@@ -70,10 +79,69 @@ body {
     display: block;
     text-align: center;
     text-decoration: underline;
-    color: blue; /* Change color to suit your design */
+    color: whitesmoke; /* Change color to suit your design */
     margin-bottom: 10px; /* Adjust the value to control the vertical space */
   }
   
   .link:hover {
-    color: darkblue; 
+    color: darkgoldenrod; 
   }
+
+  .container {
+    background: linear-gradient(to bottom, #ffbf80, #ff8c00); /* Gradient background from lighter to darker orange-gold */
+    border-radius: 20px; /* Rounded corners */
+    padding: 20px; /* Add some padding */
+    margin: 20px auto 0; /* Center the container vertically and horizontally, and adjust margin-top to move it higher */
+    max-width: 400px; /* Limit the width of the container */
+    text-align: center; /* Center the content inside the container */
+  }
+  .header {
+    font-size: 2em;
+    text-align: center; 
+    margin-top: 50px;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .button-container {
+    text-align: center;
+  }
+  /* Define the initial styles for the button */
+  .glow-button {
+    background-color: transparent;
+    border: 2px solid #007bff; /* Blue border */
+    color: #007bff; /* Blue text color */
+    padding: 10px 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for background-color and box-shadow */
+    position: relative; /* Set position to relative */
+    z-index: 1; /* Ensure button appears above background */
+  }
+  
+  /* Define the hover effect for the button */
+  .glow-button:hover {
+    background-color: rgba(0, 123, 255, 0.3); /* Blue hue with alpha (transparency) */
+    box-shadow: 0 0 80px rgba(0, 123, 255, 0.7); /* Larger and more intense blue shadow */
+  }
+
+  .not-found {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+.not-found::before {
+    content: 'OOPS, ';
+    font-size: 3rem;
+    color: #dc3545;
+}
+
+.not-found::after {
+    content: ' :(';
+    font-size: 1.5rem;
+}

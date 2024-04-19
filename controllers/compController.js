@@ -466,7 +466,6 @@ const post_endCompetition = async (req, res) => {
 };
 
 
-
 const post_rate = async (req, res) => {
   const { hostId } = req.params;
   const { rating, review } = req.body;

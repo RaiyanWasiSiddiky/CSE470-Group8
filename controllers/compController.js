@@ -957,6 +957,7 @@ const post_scoreMCQ = async (req, res) => {
       competition.scores.push({ user: userId, username: user1.username, score: score });
     }
 
+    announcement.questionSet.submittedUsers.push(user1._id);
     // Save competition changes to the database
     await competition.save();
 

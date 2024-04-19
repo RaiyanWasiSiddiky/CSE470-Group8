@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include('../partials/head.ejs') %>
+<link rel="stylesheet" href="/compdets.css">
 <body>
 
     <%- include('../partials/nav.ejs') %>
@@ -82,7 +83,7 @@
 
         <!-- Button for adding judges (visible only to hosts) -->
         <% if (user._id.toString() === comp.host._id.toString()) { %>
-            <a href="/competitions/<%= comp._id %>/addjudges" class="btn">Add Judges</a>
+            <a href="/competitions/<%= comp._id %>/addjudges" class="btn add-judge">Add Judges</a>
         <% } %>
 
 
@@ -127,12 +128,12 @@
                             <p><%= announcement.content %></p>
                         </a>
                         <% if (announcement.type === "question") { %>
-                            <h5 class="date blue-text"> Time Left: <%= getTimeLeft(announcement.questionSet.deadline) %></h5>
+                            <h5 class="date left blue-text"> Time Left: <%= getTimeLeft(announcement.questionSet.deadline) %></h5>
                         <% } %>
                         
                         <h5 class="date"><%= getTimeSince(announcement.createdAt) %></h5>
                         <a class="single" href=" /competitions/<%= comp._id %>/<%= index %> ">
-                            <h5>Comments</h5>
+                            <h5 class="comment">Comments</h5>
                         </a>
 
                         <!-- Show delete button only if isAdmin or user._id === host -->
@@ -367,6 +368,21 @@
                 console.error('Error:', error);
             });
         };
+
+        // Check if submission completed flag is set on the home page
+        // if (sessionStorage.getItem('submissionCompleted')) {
+        //     // Replace current URL with a new URL (e.g., 404 page)
+        //     history.replaceState(null, '', '/login');
+        // }
+
+        // // Listen for popstate event to handle back button
+        // window.addEventListener('popstate', function(event) {
+        //     // Check if submission completed flag is set
+        //     if (sessionStorage.getItem('submissionCompleted')) {
+        //         // Redirect user to 404 page
+        //         window.location.href = "/login";
+        //     }
+        // });
 
     </script>
 

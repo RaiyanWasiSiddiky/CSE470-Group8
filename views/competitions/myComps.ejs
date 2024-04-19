@@ -22,9 +22,11 @@
                             </a>
                             <p class="genre">Genre: <%= comp.genre %></p>
                             <div class="host announcement-author">
-                                <p>By:</p>
-                                <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+                                <div class="host-info">
+                                    <p>By: <a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></p>
+                                </div>
                             </div>
+        
                             <!-- Add delete button for host competitions -->
                             <form id="deleteForm<%= comp._id %>" style="display:inline;">
                                 <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">

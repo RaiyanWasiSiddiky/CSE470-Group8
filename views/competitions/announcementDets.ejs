@@ -21,13 +21,51 @@
         <% } %>
         <h5>Created at: <%= getTimeSince(announcement.createdAt) %></h5>
 
+        <%#= console.log(comp.judges) %>
+
+        <% if (comp.judges.find(judge => judge.user.toString() === user._id.toString()) && announcement.type === "question") { %>
+            <% if (announcement.questionSet.submissions && announcement.questionSet.submissions.length > 0) { %>
+                <h3>Submissions</h3>
+                <ul class="submissions-list">
+                    <% announcement.questionSet.submissions.forEach(function(submission, index) { %>
+                        <li>
+                            <!-- <p><%#= submission.user._id %></p> -->
+                            <p><strong>User:</strong> <%= submission.username %></p>
+                            <p><strong>Uploaded at:</strong> <%= getTimeSince(submission.uploadedAt) %></p>
+                            <% if (announcement.questionSet.type === "submission") { %>
+                                <p><%= submission.answers[0].file %></p>
+                                <a href="/<%= submission.answers[0].file %>" target="_blank">View File</a>
+
+                                <% if (submission.scoredBy.includes(user._id)) { %>
+                                    <h3>Already Scored</h3>
+                                <% } else { %>
+                                    <form action="/competitions/scoreSubmission/<%= comp._id %>/<%= announcementIndex %>/<%= index %>/<%= submission.user._id %>" method="POST">
+                                        <input type="number" name="score" min="1" max="100" required>
+                                        <button type="submit">Score Submission</button>
+                                    </form>
+                                <% } %>
+                            <% } else { %>
+                                <a href="/competitions/judgeSubmission/<%= comp._id %>/<%= announcementIndex %>/<%= index %>">Judge Submission</a>
+                            <% } %>
+                        </li>
+                    <% }); %>
+                </ul>
+                <br>
+                <br>
+            <% } else if (announcement.questionSet.type !== "mcq") { %>
+                <h2>No submissions yet</h2>
+                <br>
+                <br>
+            <% } %>
+        <% } %>
+
         <% if (announcement.type === "question") { %>
             <% if (getTimeLeft(announcement.questionSet.deadline) === "Time Over") { %>
                 <h2>The deadline has been passed, you can no longer make submissions</h2>
             <% } else if (announcement.questionSet.submittedUsers.includes(user._id)) { %>
                 <h2>You have already submitted</h2>
             <% } else { %>
-                <h2><a href="/competitions/<%= comp._id %>/<%= announcementIndex %>/answerQuestion">Answer Question</a></h2>
+                <h2 class="answerlink"><a href="/competitions/<%= comp._id %>/<%= announcementIndex %>/answerQuestion">Answer Question</a></h2>
             <% } %>
         <% } %>
 

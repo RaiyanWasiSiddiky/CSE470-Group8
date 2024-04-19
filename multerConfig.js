@@ -4,32 +4,29 @@ const path = require('path');
 // Define storage configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        return cb(null, "./uploads")
+        cb(null, './uploads'); // Set destination folder for uploaded files
     },
     filename: function (req, file, cb) {
-        return cb(null, `${userID}-${file.originalname}`)
+        cb(null, Date.now() + '-' + file.originalname); // Set filename for uploaded files
     }
 });
-  
-const upload = multer({ 
-storage: storage,
-limits: {
-    fileSize: 1024 * 1024 * 5 // Limit file size to 5MB
-},
-fileFilter: function (req, file, cb) {
-    if (file.mimetype === 'image/jpeg' || 
-        file.mimetype === 'image/png' || 
-        file.mimetype === 'application/pdf' || 
-        file.mimetype === 'text/plain') {
-    cb(null, true); // Accept file
-    } else {
-    cb(new Error('Only JPEG, PNG, PDF, and TXT files are allowed')); // Reject file
+
+// const fileFilter = function (req, file, cb) {
+//     const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain', 'application/vnd.jupyter.notebook', 'text/x-python'];
+//     if (allowedTypes.includes(file.mimetype)) {
+//         cb(null, true); // Accept file
+//     } else {
+//         cb(new Error('Only JPEG, PNG, PDF, TXT, IPYNB, and PY files are allowed'), false); // Reject file
+//     }
+// };
+
+// Initialize multer with configuration
+const upload = multer({
+    storage: storage,
+    // fileFilter: fileFilter,
+    limits: {
+        fileSize: 1024 * 1024 * 10 // Limit file size to 5MB
     }
-}
 });
 
-
-module.exports = {
-    upload: upload
-}; 
-  
+module.exports = upload;

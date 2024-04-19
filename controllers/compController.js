@@ -1,6 +1,7 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
 const timeutils = require('../timeutensils.js');
-const { ObjectId } = require('mongoose').Types;
+const upload  = require('../multerConfig'); // Adjust the path as needed
+
 
 const get_home = (req, res) => {
   const user = req.session.user;
@@ -342,7 +343,7 @@ const get_announcement = async (req, res) => {
     const announcementIndex = req.params.index;
 
     // Find the competition by ID
-    const competition = await Competition.findById(compId);
+    const competition = await Competition.findById(compId); //.populate('judges.user');
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
@@ -419,21 +420,41 @@ const post_endCompetition = async (req, res) => {
       }
 
       competition.finished = true;
-      await competition.save();
 
       const user = await User.findById(userId);
 
       // Create new announcement
+      const announcementContent = `${competition.title} has ended.\n\n`;
+
+      // Sort scores in descending order
+      const sortedScores = competition.scores.sort((a, b) => b.score - a.score);
+
+      // Add scores to the announcement
+      const scoresContent = sortedScores.map((score, index) => `${index + 1}. ${score.username} - ${score.score}`).join('\n');
+
       const announcement = {
-        content: `${competition.title} has ended.`,
-        createdBy: user._id, // Assuming user is logged in and you have access to session
-        createdByUsername: user.username, // Assuming user is logged in and you have access to session
+        content: announcementContent + scoresContent,
+        createdBy: user._id,
+        createdByUsername: user.username,
         createdAt: new Date()
       };
 
       // Add the announcement to the competition
       competition.announcements.push(announcement);
+
+      // Save changes to the competition
       await competition.save();
+
+      // Send notifications to participants
+      const participants = await User.find({ _id: { $in: competition.participants } });
+
+      participants.forEach(async (participant) => {
+        const score = sortedScores.find((score) => score.user.toString() === participant._id.toString());
+        const rank = sortedScores.findIndex((score) => score.user.toString() === participant._id.toString()) + 1;
+        const notificationContent = `${competition.title} has ended. You have scored ${score ? score.score : 0} and placed a rank of ${rank}.`;
+
+        await User.findByIdAndUpdate(participant._id, { $push: { notifications: { type: 'end', content: notificationContent, createdAt: Date.now() } } });
+      });
 
       // Redirect the user to the competition page
       res.redirect(`/competitions/${competitionId}`);
@@ -443,6 +464,7 @@ const post_endCompetition = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 const post_rate = async (req, res) => {
@@ -710,7 +732,6 @@ const post_judgeAccept = async (req, res) => {
 };
 
 
-// POST route handler to reject the judge request
 const post_judgeReject = async (req, res) => {
   try {
     const compId = req.params.compId;
@@ -757,6 +778,7 @@ const post_judgeReject = async (req, res) => {
   }
 };
 
+
 const get_answerQuestion = async (req, res) => {
   // Extract competition ID and announcement index from request parameters
   const { compId, announcementIndex } = req.params;
@@ -772,6 +794,181 @@ const get_answerQuestion = async (req, res) => {
   // Render the answer.ejs page with necessary data
   res.render('competitions/answer', { compId, announcementIndex, questionSet, user, title: `Answering ${questionSet.title}`});
 };
+
+
+const post_submitSubmissionAnswer = async (req, res) => {
+  const { user } = req.session;
+  const { question } = req.body;
+
+  try {
+      const competitionId = req.params.compId; // Assuming you pass competition ID in the URL
+      const competition = await Competition.findById(competitionId);
+
+      // Handle file upload using Multer middleware
+      // console.log(upload);
+      upload.single('file')(req, res, async function (err) {
+        if (err) {
+            console.error('Error uploading file:', err);
+            return res.status(400).send('Error uploading file');
+        }
+
+        // Access uploaded file path using req.file
+        const filePath = req.file.path;
+
+        // Save submission data to database
+        const submissionData = {
+            user: user._id,
+            username: user.username,
+            answers: [{
+                question: question,
+                file: filePath // Store the path to the uploaded file
+            }],
+            uploadedAt: new Date()
+        };
+
+        competition.announcements[req.body.announcementIndex].questionSet.submittedUsers.push(user._id);
+        competition.announcements[req.body.announcementIndex].questionSet.submissions.push(submissionData);
+
+        // Save competition changes to database
+        await competition.save();
+
+        res.redirect(`/competitions/${competitionId}`); // Redirect to home page or appropriate page after submission
+      });
+
+  } catch (error) {
+      console.error('Error submitting answer:', error);
+      res.status(500).send('Error submitting answer');
+  }
+};
+
+
+const get_judgeSubmission = async (req, res) => {
+  try {
+      const { compId, announcementIndex, submissionIndex } = req.params;
+
+      // Find the competition by ID
+      const competition = await Competition.findById(compId);
+      if (!competition) {
+          return res.status(404).render('404', { title: "Competition not found" });
+      }
+
+      // Get the specific announcement using the index
+      const announcement = competition.announcements[announcementIndex];
+      if (!announcement) {
+          return res.status(404).render('404', { title: "Announcement not found" });
+      }
+
+      // Get the specific submission using the index
+      const submission = announcement.questionSet.submissions[submissionIndex];
+      if (!submission) {
+          return res.status(404).render('404', { title: "Submission not found" });
+      }
+
+      // Render a view to display the submission details for judging
+      res.render('judgeSubmission', { competition, announcement, submission });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+const post_scoreSubmission = async (req, res) => {
+  try {
+      const { compId, announcementIndex, submissionIndex, userId } = req.params;
+      const score = req.body.score;
+      const user = req.session.user;
+
+      // console.log(score);
+      // Validate the score input
+      if (!score || isNaN(score) || score < 1 || score > 100) {
+          return res.status(400).send('Invalid score. Please enter a number between 1 and 100.');
+      }
+
+      const competition = await Competition.findById(compId);
+      const user1 = await User.findById(userId);
+
+      // Check if the user already has a score
+      const existingScoreIndex = competition.scores.findIndex(score => score.user.toString() === userId);
+      if (existingScoreIndex !== -1) {
+          // User already has a score, update it
+          competition.scores[existingScoreIndex].score += score;
+      } else {
+          // User doesn't have a score, add a new entry
+          competition.scores.push({ user: userId, username: user1.username, score: score });
+      }
+
+      competition.announcements[announcementIndex].questionSet.submissions[submissionIndex].scoredBy = user._id;
+      
+      await competition.save();
+
+      res.redirect(`/competitions/${compId}/${announcementIndex}`);
+      // res.status(200).send('Submission scored successfully.');
+
+  } catch (error) {
+      console.error('Error scoring submission:', error);
+      res.status(500).send('Error scoring submission.');
+  }
+};
+
+
+const post_scoreMCQ = async (req, res) => {
+  try {
+    const { compId, userId } = req.params;
+    const { questionType, announcementIndex } = req.body;
+    const userAnswers = req.body; // All answers are sent in the request body
+
+    // Fetch competition and announcement
+    const competition = await Competition.findById(compId);
+    const announcement = competition.announcements[announcementIndex];
+
+    const user1 = await User.findById(userId);
+
+    // Initialize variables for tracking score calculation
+    let totalQuestions = 0;
+    let correctAnswers = 0;
+
+    // Iterate through each question and check the user's answer
+    announcement.questionSet.questions.forEach((question, questionIndex) => {
+      const userAnswer = userAnswers[`answer${questionIndex + 1}`];
+      const correctAnswer = question.correctAnswer; // Assuming correct answer is stored in question object
+
+      console.log(userAnswer, correctAnswer);
+
+      if (userAnswer === correctAnswer) {
+        correctAnswers++;
+      }
+
+      totalQuestions++;
+    });
+
+    // Calculate score (number of correct answers / total questions)
+    const score = (correctAnswers / totalQuestions) * 100; // Multiply by 100 to get percentage
+
+    console.log(score);
+
+    // Check if the user already has a score
+    const existingScoreIndex = competition.scores.findIndex(score => score.user.toString() === userId);
+    if (existingScoreIndex !== -1) {
+      // User already has a score, overwrite it
+      competition.scores[existingScoreIndex].score += score;
+    } else {
+      // User doesn't have a score, add a new entry
+      competition.scores.push({ user: userId, username: user1.username, score: score });
+    }
+
+    // Save competition changes to the database
+    await competition.save();
+
+    res.redirect(`/competitions/${compId}/${announcementIndex}`);
+    
+  } catch (error) {
+    console.error('Error scoring MCQ submission:', error);
+    res.status(500).send('Error scoring MCQ submission.');
+  }
+};
+
 
 module.exports = {
   get_home,
@@ -796,5 +993,9 @@ module.exports = {
   post_judgeAccept,
   post_judgeReject,
   post_createQuestion,
-  get_answerQuestion
+  get_answerQuestion,
+  post_submitSubmissionAnswer,
+  get_judgeSubmission,
+  post_scoreSubmission,
+  post_scoreMCQ
 };

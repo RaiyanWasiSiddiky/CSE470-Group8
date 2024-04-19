@@ -1,0 +1,123 @@
+/* Styles for the content container */
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Styles for headings */
+  h2, h3, h4, h5 {
+    color: goldenrod;
+    margin-bottom: 10px;
+  }
+
+  h2{
+    text-decoration: underline;
+  }
+  
+  h5.date {
+    color: red;
+  }
+  
+  /* Styles for links */
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Styles for buttons */
+  button.btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  button.btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Styles for forms */
+  form {
+    margin-bottom: 20px;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  /* Styles for announcements */
+  .announcements {
+    margin-top: 20px;
+  }
+  
+  .announcement {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .announcement h4,
+  .announcement p,
+  .announcement h5 {
+    margin: 0;
+  }
+  
+  .announcement h5 {
+    color: goldenrod;
+  }
+  
+  .announcement .left {
+    color: red;
+  }
+  
+  .announcement .comment {
+    color: blue;
+  }
+  
+  /* Styles for delete buttons */
+  .delete-announcement {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .delete-announcement:hover {
+    background-color: #c82333;
+  }
+  
+  /* Adjust the width of the add judge button */
+  .btn.add-judge {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 123px;
+  }
+  
+  .btn.add-judge:hover {
+    background-color: #0056b3;
+  }
+
+
+  

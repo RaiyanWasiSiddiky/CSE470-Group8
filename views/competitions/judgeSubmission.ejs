@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+<body>
+
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="judge-submission content">
+        <h3>Judging Submission</h3>
+        <p><strong>User:</strong> <%= submission.username %></p>
+        <p><strong>Uploaded at:</strong> <%= getTimeSince(submission.uploadedAt) %></p>
+        
+        <!-- Display submission content, file, etc. -->
+        <!-- Allow judges to provide feedback or scores -->
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+</body>
+</html>

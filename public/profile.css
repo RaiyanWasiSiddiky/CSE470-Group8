@@ -1,0 +1,104 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1, h2, h4 {
+    color: #333;
+}
+
+.user-info {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: indigo;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"] {
+    width: calc(100% - 20px); /* Adjust width */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333; /* Default text color */
+}
+
+input[type="text"]:disabled,
+input[type="email"]:disabled,
+input[type="date"]:disabled {
+    color: #fff; /* Change text color for disabled inputs */
+}
+
+input[type="checkbox"] {
+    margin-top: 8px;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Reviews Section */
+.review ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.review ul li {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hosted Competitions Section */
+.competition {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.competition a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.competition a:hover {
+    text-decoration: underline;
+}
+
+.title {
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.genre {
+    color: #777;
+}

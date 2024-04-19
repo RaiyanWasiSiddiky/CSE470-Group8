@@ -29,10 +29,13 @@
                     </a>
                     <p class="genre">Genre: <%= comp.genre %></p>
                     <div class="host announcement-author">
-                        <p>By:</p>
-                        <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+                        <div class="host-info">
+                            <p>By: <a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></p>
+                        </div>
+                        <div class="host-rating">
+                            <h4>Host Rating: <%= comp.host.avgRating %></h4>
+                        </div>
                     </div>
-                    <h4>Host Rating: <%= comp.host.avgRating %></h4>
 
                     <% if (user.isAdmin || user._id.toString() === comp.host._id.toString()) { %>
                         <form id="deleteForm<%= comp._id %>" style="display:inline;">

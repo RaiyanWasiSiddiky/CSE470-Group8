@@ -212,7 +212,16 @@ const announcementSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'User'
             },
-            file: String, // Store the path to the uploaded file
+            scoredBy: [{
+                type: Schema.Types.ObjectId,
+                ref: 'User'
+            }],
+            username: String,
+            answers: [{
+                question: String,
+                answer: String,
+                file: String // Store the path to the uploaded file
+            }],
             uploadedAt: {
                 type: Date,
                 default: Date.now
@@ -253,7 +262,11 @@ const competitionSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
-        score: Number, 
+        username: String,
+        score: {
+            type: Number,
+            default: 0
+        }
     }],
     hostUsername: String, // Add a field to store the username
     judges: [{

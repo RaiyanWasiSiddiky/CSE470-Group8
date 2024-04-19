@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="/profile.css">
 <%- include('./partials/head.ejs') %>
 
 <body>
@@ -43,7 +44,7 @@
                 <label for="dob">Date of Birth:</label>
                 <input type="date" id="dob" value="<%= profileuser.dob.toISOString().slice(0, 10) %>" required <%= (user && user._id.toString() === profileuser._id.toString()) ? '' : 'disabled' %>>
             </div>
-            <div>
+            <div class="joining-date">
                 <label for="joiningDate">Joining Date:</label>
                 <input type="text" id="joiningDate" value="<%= profileuser.joiningDate.toDateString() %>" disabled>
             </div>
@@ -58,16 +59,18 @@
             <% } %>
         </form>
 
+        <div class="review">
         <h2>User Reviews</h2>
-        <ul>
-            <% profileuser.reviews.forEach(review => { %>
-                <li>
-                    <p><strong>Reviewer:</strong> <%= review.reviewerUsername %></p>
-                    <p><strong>Rating:</strong> <%= review.rating %></p>
-                    <p><strong>Content:</strong> <%= review.content %></p>
-                </li>
-            <% }); %>
-        </ul>
+            <ul>
+                <% profileuser.reviews.forEach(review => { %>
+                    <li>
+                        <p><strong>Reviewer:</strong> <%= review.reviewerUsername %></p>
+                        <p><strong>Rating:</strong> <%= review.rating %></p>
+                        <p><strong>Content:</strong> <%= review.content %></p>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
         
         <h2>Hosted Competitions</h2>
         <% if (profileuser.competitions.length > 0) { %>

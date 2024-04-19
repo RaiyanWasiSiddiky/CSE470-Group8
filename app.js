@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const compRoutes = require('./routes/compRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const unlogRoutes = require('./routes/unlogRoutes');
+const path = require('path');
+
 
 const app = express();
 
@@ -25,6 +27,7 @@ app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended:true }));
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 

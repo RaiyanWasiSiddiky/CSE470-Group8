@@ -12,35 +12,51 @@
             <!-- Display question -->
             <p><strong>Question:</strong> <%= questionSet.questions[0].question %></p>
             <!-- File upload -->
-            <form action="/submitAnswer" method="POST" enctype="multipart/form-data">
+            <form action="/competitions/upload/<%= compId %>" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="questionType" value="submission"> <!-- Hidden input field for submission type -->
+                <input type="hidden" name="question" value="<%= questionSet.questions[0].question %>"> <!-- Hidden input field for question -->
+                <input type="hidden" name="announcementIndex" value="<%= announcementIndex %>"> <!-- Hidden input field for announcement index -->
                 <input type="file" name="file" required>
+                <!-- Submit button for submission type -->
                 <button type="submit">Submit</button>
             </form>
         <% } else if (questionSet.type === 'short') { %>
             <!-- Display questions and text areas for each -->
-            <% questionSet.questions.forEach((question, index) => { %>
-                <p><strong>Question <%= index+1 %>:</strong> <%= question.question %></p>
-                <textarea name="answer<%= index + 1 %>" rows="4" cols="50" required></textarea>
-            <% }); %>
-            <!-- Submit button -->
-            <button type="submit">Submit</button>
+            <form action="/competitions/upload/<%= compId %>" method="POST">
+                <input type="hidden" name="questionType" value="short"> <!-- Hidden input field for short type -->
+                <input type="hidden" name="announcementIndex" value="<%= announcementIndex %>"> <!-- Hidden input field for announcement index -->
+                <% questionSet.questions.forEach((question, index) => { %>
+                    <p><strong>Question <%= index+1 %>:</strong> <%= question.question %></p>
+                    <input type="hidden" name="question<%= index + 1 %>" value="<%= question.question %>"> <!-- Hidden input field for question -->
+                    <textarea name="answer<%= index + 1 %>" rows="4" cols="50" required></textarea>
+                <% }); %>
+                <button type="submit">Submit</button>
+            </form>
         <% } else if (questionSet.type === 'mcq') { %>
             <!-- Iterate over each question -->
-            <% questionSet.questions.forEach((question, questionIndex) => { %>
-                <!-- Display question -->
-                <p><strong>Question <%= questionIndex + 1 %>:</strong> <%= question.question %></p>
-                <!-- Iterate over each answer for the current question -->
-                <% question.answers.forEach((answer, answerIndex) => { %>
-                    <input type="radio" id="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>" name="answer<%= questionIndex + 1 %>" value="<%= answer %>" required>
-                    <label for="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>"><%= answer %></label><br>
+            <form action="/competitions/scoreMCQ/<%= compId %>/<%= user._id %>" method="POST">
+                <input type="hidden" name="questionType" value="mcq"> <!-- Hidden input field for mcq type -->
+                <input type="hidden" name="announcementIndex" value="<%= announcementIndex %>"> <!-- Hidden input field for announcement index -->
+                <% questionSet.questions.forEach((question, questionIndex) => { %>
+                    <!-- Display question -->
+                    <p><strong>Question <%= questionIndex + 1 %>:</strong> <%= question.question %></p>
+                    <input type="hidden" name="question<%= questionIndex + 1 %>" value="<%= question.question %>"> <!-- Hidden input field for question -->
+                    <!-- Iterate over each answer for the current question -->
+                    <% question.answers.forEach((answer, answerIndex) => { %>
+                        <input type="radio" id="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>" name="answer<%= questionIndex + 1 %>" value="<%= answerIndex+1 %>" required>
+                        <label for="answer<%= questionIndex + 1 %>-<%= answerIndex + 1 %>"><%= answer %></label><br>
+                    <% }); %>
                 <% }); %>
-            <% }); %>
-            <!-- Submit button -->
-            <button type="submit">Submit</button>
+                <button type="submit">Submit</button>
+            </form>
         <% } %>
     </div>
 
     <%- include('../partials/footer.ejs') %>
+
+    <script>
+        // sessionStorage.setItem('submissionCompleted', 'true');
+    </script>
 
 </body>
 </html>

@@ -6,6 +6,7 @@ router.get('/home', compController.get_home);
 router.get('/applyhost', compController.get_applyhost);
 router.get('/createcomp', compController.get_createcomp);
 router.get('/myComps/:userId', compController.get_myComps);
+router.get('/judgeSubmission/:compId/:announcementIndex/:submissionIndex', compController.get_judgeSubmission);
 router.get('/:id', compController.get_comp);
 router.get('/:compId/addjudges', compController.get_addJudge);
 router.get('/:id/createQuestion', compController.get_createQuestion);
@@ -15,7 +16,10 @@ router.get('/:compId/:announcementIndex/answerQuestion', compController.get_answ
 router.post('/applyhost', compController.post_applyhost);
 router.post('/home', compController.post_createcomp);
 router.post('/join', compController.post_joinCompetition);
+router.post('/upload/:compId', compController.post_submitSubmissionAnswer);
 router.post('/rate/:hostId', compController.post_rate);
+router.post('/scoreMCQ/:compId/:userId', compController.post_scoreMCQ);
+router.post('/scoreSubmission/:compId/:announcementIndex/:submissionIndex/:userId', compController.post_scoreSubmission);
 router.post('/:id', compController.post_announcement);
 router.post('/:competitionId/end', compController.post_endCompetition);
 router.post('/:compId/judgeAccept', compController.post_judgeAccept);

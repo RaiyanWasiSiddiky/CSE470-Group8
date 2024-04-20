@@ -3,22 +3,22 @@ const timeutils = require('../timeutensils.js');
 
 const get_index = (req, res)=>{
     res.render('index', {title: 'Welcome'});
-  };
+};
   
 
 const get_login = (req, res)=>{
     res.render('login', {title: 'Login'});
-  };
+};
   
 
 const get_signup = (req, res)=>{
     res.render('signup', {title: 'signup'});
-  };
+};
   
 
 const get_forgotpass = (req, res)=>{
     res.render('forgotpass', {title: 'Reset Password'});
-  };
+};
 
 
 const get_signout = (req, res) => {

@@ -9,54 +9,76 @@
         <!-- Add the Create New Competition link here -->
         <a href="/competitions/createcomp">Create New Competition</a>
 
+        <!-- Display Host Competitions -->
         <div class="host-competitions">
             <h2>Host Competitions</h2>
-            <% if (user.competitions.filter(comp => comp.host.toString() === user._id.toString()).length === 0) { %>
+            <% const hostCompetitions = user.competitions.filter(comp => comp.host.toString() === user._id.toString()); %>
+            <% if (hostCompetitions.length === 0) { %>
                 <p>No Host Competitions</p>
             <% } else { %>
-                <% user.competitions.forEach(comp => { %>
-                    <% if (comp.host.toString() === user._id.toString()) { %>
-                        <div class="competition">
-                            <a class="single" href="/competitions/<%= comp._id %>">
-                                <h3 class="title"><%= comp.title %></h3>
-                            </a>
-                            <p class="genre">Genre: <%= comp.genre %></p>
-                            <div class="host announcement-author">
-                                <div class="host-info">
-                                    <p>By: <a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></p>
-                                </div>
+                <% hostCompetitions.forEach(comp => { %>
+                    <div class="competition">
+                        <a class="single" href="/competitions/<%= comp._id %>">
+                            <h3 class="title"><%= comp.title %></h3>
+                        </a>
+                        <p class="genre">Genre: <%= comp.genre %></p>
+                        <div class="host announcement-author">
+                            <div class="host-info">
+                                <p>By: <a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></p>
                             </div>
-        
-                            <!-- Add delete button for host competitions -->
-                            <form id="deleteForm<%= comp._id %>" style="display:inline;">
-                                <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">
-                                    <img src="/trashcan.svg" alt="delete icon">
-                                </button>
-                            </form>
                         </div>
-                    <% } %>
+            
+                        <!-- Add delete button for host competitions -->
+                        <form id="deleteForm<%= comp._id %>" style="display:inline;">
+                            <button type="button" class="delete-button" onclick="deleteCompetition('<%= comp._id %>')">
+                                <img src="/trashcan.svg" alt="delete icon">
+                            </button>
+                        </form>
+                    </div>
                 <% }); %>
             <% } %>
         </div>
 
+        <!-- Display Participating Competitions -->
         <div class="participating-competitions">
             <h2>Participating Competitions</h2>
-            <% if (user.competitions.filter(comp => comp.host.toString() !== user._id.toString()).length === 0) { %>
+            <% const participatingCompetitions = user.competitions.filter(comp => comp.host.toString() !== user._id.toString() && !comp.finished); %>
+            <% if (participatingCompetitions.length === 0) { %>
                 <p>No Participating Competitions</p>
             <% } else { %>
-                <% user.competitions.forEach(comp => { %>
-                    <% if (comp.host.toString() !== user._id.toString()) { %>
-                        <div class="competition">
-                            <a class="single" href="/competitions/<%= comp._id %>">
-                                <h3 class="title"><%= comp.title %></h3>
-                            </a>
-                            <p class="genre">Genre: <%= comp.genre %></p>
-                            <div class="host announcement-author">
-                                <p>By:</p>
-                                <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
-                            </div>
+                <% participatingCompetitions.forEach(comp => { %>
+                    <div class="competition">
+                        <a class="single" href="/competitions/<%= comp._id %>">
+                            <h3 class="title"><%= comp.title %></h3>
+                        </a>
+                        <p class="genre">Genre: <%= comp.genre %></p>
+                        <div class="host announcement-author">
+                            <p>By:</p>
+                            <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
                         </div>
-                    <% } %>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+
+        <!-- Display Finished Competitions -->
+        <div class="finished-competitions">
+            <h2>Finished Competitions</h2>
+            <% const finishedCompetitions = user.competitions.filter(comp => comp.host.toString() !== user._id.toString() && comp.finished); %>
+            <% if (finishedCompetitions.length === 0) { %>
+                <p>No Finished Competitions</p>
+            <% } else { %>
+                <% finishedCompetitions.forEach(comp => { %>
+                    <div class="competition">
+                        <a class="single" href="/competitions/<%= comp._id %>">
+                            <h3 class="title"><%= comp.title %></h3>
+                        </a>
+                        <p class="genre">Genre: <%= comp.genre %></p>
+                        <div class="host announcement-author">
+                            <p>By:</p>
+                            <h4><a href="/profile/<%= comp.host._id%>"><%= comp.hostUsername %></a></h4>
+                        </div>
+                    </div>
                 <% }); %>
             <% } %>
         </div>

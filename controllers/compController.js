@@ -429,8 +429,10 @@ const post_endCompetition = async (req, res) => {
       // Sort scores in descending order
       const sortedScores = competition.scores.sort((a, b) => b.score - a.score);
 
-      // Add scores to the announcement
-      const scoresContent = sortedScores.map((score, index) => `${index + 1}. ${score.username} - ${score.score}`).join('\n');
+      let scoresContent = "These are the Rankings:\n";
+      sortedScores.forEach((score, index) => {
+          scoresContent += `${index + 1}. ${score.username} - ${score.score}\n`;
+      });
 
       const announcement = {
         content: announcementContent + scoresContent,
@@ -451,7 +453,7 @@ const post_endCompetition = async (req, res) => {
       participants.forEach(async (participant) => {
         const score = sortedScores.find((score) => score.user.toString() === participant._id.toString());
         const rank = sortedScores.findIndex((score) => score.user.toString() === participant._id.toString()) + 1;
-        const notificationContent = `${competition.title} has ended. You have scored ${score ? score.score : 0} and placed a rank of ${rank}.`;
+        const notificationContent = `${competition.title} has ended.\n You have a total score of ${score ? score.score : 0} and placed rank ${rank}.`;
 
         await User.findByIdAndUpdate(participant._id, { $push: { notifications: { type: 'end', content: notificationContent, createdAt: Date.now() } } });
       });

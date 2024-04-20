@@ -789,6 +789,7 @@ const post_submitSubmissionAnswer = async (req, res) => {
 };
 
 
+// did not use this for shorts
 const get_judgeSubmission = async (req, res) => {
   try {
       const { compId, announcementIndex, submissionIndex } = req.params;

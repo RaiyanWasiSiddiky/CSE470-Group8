@@ -1,6 +1,7 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
 const timeutils = require('../timeutensils.js');
 
+
 const get_index = (req, res)=>{
     res.render('index', {title: 'Welcome'});
 };

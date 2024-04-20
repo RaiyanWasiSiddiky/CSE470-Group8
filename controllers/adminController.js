@@ -1,5 +1,6 @@
 const {User, Admin, Applicant, Competition} = require('../models/schemas');
 
+
 const get_adminUsers =  async (req, res) => {
     try {
       const user = req.session.user;
@@ -11,7 +12,7 @@ const get_adminUsers =  async (req, res) => {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  };
+};
 
 
 const get_authenticate = async (req, res) => {

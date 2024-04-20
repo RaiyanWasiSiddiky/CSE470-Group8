@@ -3,10 +3,8 @@ const {User, Admin, Applicant, Competition} = require('../models/schemas');
 const get_adminUsers =  async (req, res) => {
     try {
       const user = req.session.user;
-      // Fetch all users from the database
       const users = await User.find();
-  
-      // Render a page to display the list of users
+
       res.render('admins/adminUsers', { title: "All Users", users: users, user });
       
     } catch (error) {
@@ -18,11 +16,9 @@ const get_adminUsers =  async (req, res) => {
 
 const get_authenticate = async (req, res) => {
   try {
-      // Fetch all applications from the database
       const user = req.session.user;
       const applicants = await Applicant.find();
 
-      // Render the applications page with the retrieved applications data
       res.render('admins/authenticate', { title: "Applicants", applicants, user });
 
   } catch (error) {
@@ -36,21 +32,19 @@ const post_acceptApplicant = async (req, res) => {
   try {
     const applicantID = req.body.applicantID;
 
-    // Retrieve the user associated with the applicant
     const applicant = await Applicant.findById(applicantID);
     const userId = applicant.user;
 
-    // Update the user's hostAuth property to true
+    // Update hostAuth
     await User.findByIdAndUpdate(userId, { hostAuth: true });
 
-    // Delete the applicant from the collection
+    // Delete applicant
     await Applicant.deleteOne({ _id: applicantID });
 
-    // Create a notification for the user
+    // Create notification
     const notificationContent = 'Your request for host Authentication has been approved';
     await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
 
-    // Redirect back to the authenticate page after accepting
     res.redirect(`/admins/authenticate`);
     // res.json({ redirect: `/admins/authenticate` })
  
@@ -65,18 +59,17 @@ const post_rejectApplicant = async (req, res) => {
   try {
     const applicantID = req.body.applicantID;
 
-    // Retrieve the user associated with the applicant
     const applicant = await Applicant.findById(applicantID);
     const userId = applicant.user;
 
-    // Delete the applicant from the collection
+    // Delete applicant
     await Applicant.deleteOne({ _id: applicantID });
 
-    // Create a notification for the user
+    // Create notification
     const notificationContent = 'Your request for host Authentication has been rejected';
     await User.findByIdAndUpdate(userId, { $push: { notifications: { type: 'authentication', content: notificationContent, createdAt: new Date() } } });
 
-    // Redirect back to the authenticate page after rejecting
+    // Testing JSON redirect vs regular redirect
     // res.json({ redirect: `/admins/authenticate` })
     res.redirect(`/admins/authenticate`);
 
@@ -91,11 +84,9 @@ const delete_user = async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Find the user by ID and delete it
+        // Delete
         await User.findByIdAndDelete(userId);
         
-        // Redirect to the all users page or any other appropriate page
-        // res.json({ redirect: `/admins/adminUsers` })
         res.redirect(`/admins/adminUsers`);
 
     } catch (error) {
@@ -105,11 +96,12 @@ const delete_user = async (req, res) => {
 };
 
 // same as above but added logic that all competitions hosted by user are also deleted
+// not sure if this would be good idea so kept it commented for now
+
 // const delete_user = async (req, res) => {
 //   const userId = req.params.id;
 
 //   try {
-//       // Find the user by ID and populate the 'competitions' field
 //       const user = await User.findById(userId).populate('competitions');
       
 //       if (!user) {

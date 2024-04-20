@@ -7,7 +7,6 @@ const get_home = (req, res) => {
   const user = req.session.user;
   const searchQuery = req.query.search;
 
-  // Check if there is a search query
   if (searchQuery) {
     // If there is a search query, filter competitions based on the query
     Competition.find({
@@ -49,11 +48,10 @@ const get_applyhost = (req, res) => {
 
 const post_applyhost = async (req, res) => {
   try {
-    // Extract user data and application reason from request body
-    const { reason } = req.body;
-    const user = req.session.user; // Assuming user data is available in the request object
 
-    // Create a new applicant instance
+    const { reason } = req.body;
+    const user = req.session.user; 
+
     const newApplicant = new Applicant({
         user: user._id,
         username: user.username,
@@ -61,11 +59,8 @@ const post_applyhost = async (req, res) => {
         reason
     });
 
-    // Save the new applicant to the database
     await newApplicant.save();
 
-    // Send a success response
-    // res.json({ redirect: `/competitions/home` })
     res.status(201).json({ message: 'Application submitted successfully' });
 
   } catch (error) {
@@ -87,6 +82,7 @@ const get_comp = (req, res) => {
     })
     .then((result) => {
       // Sort announcements in descending order based on createdAt field
+      // sorting kinda messes up the whole thing unfortunately cz i used index to get announcements instead of the announcement ID Sighhhhhh
       // result.announcements.sort((a, b) => b.createdAt - a.createdAt);
       res.render('competitions/compDets', { comp: result, getTimeSince: timeutils.getTimeSince, getTimeLeft: timeutils.getTimeLeft, title: result.title, user: user });
     })
@@ -105,13 +101,11 @@ const get_createcomp = function(req, res){
 
 const post_createcomp = async (req, res) => {
   try {
-    // Extract competition details from the request body
     const userId = req.session.user._id;
     const { title, genre, about } = req.body;
 
     const user = await User.findById(userId);
 
-    // Create a new competition instance
     const newCompetition = new Competition({
         title,
         genre,
@@ -122,14 +116,11 @@ const post_createcomp = async (req, res) => {
 
     newCompetition.judges.push({ user: user._id, judgeName: user.username,  status: 'accepted' });
 
-    // Save the new competition to the database
     await newCompetition.save();
 
-    // Add the comp._id of the newly created competition to the user's competitions array
     user.competitions.push(newCompetition._id);
     await user.save();
 
-    // Redirect to the home page or display a success message
     res.redirect(`/competitions/home`);
 
   } catch (error) {
@@ -143,23 +134,21 @@ const post_joinCompetition = async (req, res) => {
   try {
     const { compId } = req.body;
     const userId = req.session.user._id;
-    
-    // Update user's competitions array
+
     await User.findByIdAndUpdate(userId, { $addToSet: { competitions: compId } });
 
-    // Update competition's participants array
     await Competition.findByIdAndUpdate(compId, { $addToSet: { participants: userId } });
 
-    // Get the competition details including the host
     const competition = await Competition.findById(compId).populate('host');
 
-    // Create notification content
+    // Create notification 
     const notificationContent = `${req.session.user.username} has joined ${competition.title}`;
 
     // Update host's notifications
     await User.findByIdAndUpdate(competition.host._id, { $push: { notifications: { type: 'join', content: notificationContent, createdAt: Date.now() } } });
 
     // res.redirect(`/competitions/myComps/${userId}`);
+    // having to do this because redirect not updating data for some reason
     res.redirect(`/login`);
 
   } catch (error) {
@@ -172,8 +161,7 @@ const post_joinCompetition = async (req, res) => {
 const get_myComps = async (req, res) => {
   try {
     const userID = req.params.userId;
-    
-    // Fetch user's competitions
+
     const user = await User.findById(userID).populate('competitions');
 
     // console.log(user);
@@ -212,13 +200,14 @@ const post_createQuestion = async (req, res) => {
     const { questionTitle, deadline, type } = req.body;
     let questions = [];
 
-    // If the type is submission, short, or mcq, add questions from request body
+    // if submission push just question
     if (type === 'submission') {
       questions.push({
         question: req.body.submissionQuestion,
         answers: null,
         correctAnswer: null
       });
+      // if short push questions in loop
     } else if (type === 'short') {
       for (let i = 1; i <= req.body.numQuestions; i++) {
         const question = req.body[`question${i}`];
@@ -228,8 +217,8 @@ const post_createQuestion = async (req, res) => {
           correctAnswer: null
         });
       }
+      // if mcq push questions, answers and correct answers in loop
     } else if (type === 'mcq') {
-      // If the type is short or mcq, construct questions array from request body
       for (let i = 1; i <= req.body.numQuestions; i++) {
         const question = req.body[`question${i}`];
         const answers = [
@@ -268,7 +257,6 @@ const post_createQuestion = async (req, res) => {
 
     const competition = await Competition.findById(req.params.compId);
 
-    // Push the announcement into the competition schema
     await Competition.findByIdAndUpdate(req.params.compId, {
       $push: { announcements: newannouncement },
     });
@@ -281,7 +269,6 @@ const post_createQuestion = async (req, res) => {
       await User.findByIdAndUpdate(participantId, { $push: { notifications: { type: 'question', content: notificationContent, createdAt: new Date() } } });
     }
 
-    // Redirect back to the same page after posting announcement
     res.redirect(`/competitions/${req.params.compId}`);
 
   } catch (error) {
@@ -297,14 +284,12 @@ const post_announcement = async (req, res) => {
     const compId = req.params.id;
     const textContent = req.body.text_content;
 
-    // Find the competition by ID
     const competition = await Competition.findById(compId);
 
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
 
-    // Create a new announcement object
     const newAnnouncement = {
         content: textContent,
         createdBy: user._id,
@@ -312,10 +297,8 @@ const post_announcement = async (req, res) => {
         createdAt: new Date()
     };
 
-    // Push the new announcement to the announcements array
     competition.announcements.push(newAnnouncement);
 
-    // Save the updated competition document
     await competition.save();
 
     // Create notification content
@@ -326,7 +309,6 @@ const post_announcement = async (req, res) => {
       await User.findByIdAndUpdate(participantId, { $push: { notifications: { type: 'announcement', content: notificationContent, createdAt: new Date() } } });
     }
 
-    // Redirect back to the same page after posting announcement
     res.redirect(`/competitions/${compId}`);
 
   } catch (error) {
@@ -342,21 +324,17 @@ const get_announcement = async (req, res) => {
     const compId = req.params.id;
     const announcementIndex = req.params.index;
 
-    // Find the competition by ID
     const competition = await Competition.findById(compId); //.populate('judges.user');
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
 
-    // Ensure the announcementIndex is a valid number
     if (isNaN(announcementIndex) || announcementIndex < 0 || announcementIndex >= competition.announcements.length) {
         return res.status(400).json({ error: 'Invalid announcement index' });
     }
 
-    // Get the specific announcement using the index
     const announcement = competition.announcements[announcementIndex];
 
-    // Render the announcement_details view with the announcement data
     res.render('competitions/announcementDets', { comp: competition, getTimeSince: timeutils.getTimeSince, getTimeLeft: timeutils.getTimeLeft, title: competition.title, announcement, announcementIndex, user:user });
 
   } catch (error) {
@@ -373,18 +351,15 @@ const post_comment = async (req, res) => {
     const announcementIndex = req.params.index;
     const { comment_content } = req.body;
 
-    // Find the competition by ID
     const competition = await Competition.findById(compId);
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
 
-    // Ensure the announcementIndex is within the valid range
     if (announcementIndex < 0 || announcementIndex >= competition.announcements.length) {
         return res.status(400).json({ error: 'Invalid announcement index' });
     }
 
-    // Create a new comment object
     const newComment = {
         content: comment_content,
         author: user._id,
@@ -392,13 +367,10 @@ const post_comment = async (req, res) => {
         createdAt: new Date()
     };
 
-    // Add the new comment to the specified announcement's comments array
     competition.announcements[announcementIndex].comments.push(newComment);
 
-    // Save the updated competition document
     await competition.save();
 
-    // Respond with a success message
     res.redirect(`/competitions/${compId}/${announcementIndex}`);
     // res.status(200).json({ message: 'Comment posted successfully' });
 
@@ -441,10 +413,10 @@ const post_endCompetition = async (req, res) => {
         createdAt: new Date()
       };
 
-      // Add the announcement to the competition
+
       competition.announcements.push(announcement);
 
-      // Save changes to the competition
+
       await competition.save();
 
       // Send notifications to participants
@@ -458,7 +430,6 @@ const post_endCompetition = async (req, res) => {
         await User.findByIdAndUpdate(participant._id, { $push: { notifications: { type: 'end', content: notificationContent, createdAt: Date.now() } } });
       });
 
-      // Redirect the user to the competition page
       res.redirect(`/competitions/${competitionId}`);
 
   } catch (error) {
@@ -474,16 +445,14 @@ const post_rate = async (req, res) => {
   const currentUserId = req.session.user._id;
 
   try {
-      // Find the host and the current user by their IDs
+
       const host = await User.findById(hostId);
       const currentUser = await User.findById(currentUserId);
 
-      // Check if the host and current user exist
       if (!host || !currentUser) {
           return res.status(404).render('404', { title: 'User not found' });
       }
 
-      // Add the rating and review to the host's reviews array
       host.reviews.push({
           reviewerId: currentUser._id,
           reviewerUsername: currentUser.username,
@@ -496,10 +465,8 @@ const post_rate = async (req, res) => {
       const avgRating = totalRatings / host.reviews.length;
       host.avgRating = avgRating;
 
-      // Save the updated host document
       await host.save();
 
-      // Send a success response
       res.status(200).json({ message: 'Rating and review submitted successfully' });
   } catch (error) {
       // Handle errors
@@ -515,21 +482,18 @@ const delete_announcement = async (req, res) => {
     const compId = req.params.id;
     const announcementIndex = req.params.index;
 
-    // Find the competition by ID
     const competition = await Competition.findById(compId);
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
 
-    // Ensure the announcementIndex is a valid number
     if (isNaN(announcementIndex) || announcementIndex < 0 || announcementIndex >= competition.announcements.length) {
         return res.status(400).json({ error: 'Invalid announcement index' });
     }
 
-    // Remove the announcement from the array
+
     competition.announcements.splice(announcementIndex, 1);
 
-    // Save the updated competition document
     await competition.save();
 
     res.status(200).json({ message: 'Announcement deleted successfully' });
@@ -545,7 +509,6 @@ const delete_comp = async (req, res) => {
   try {
     const id = req.params.id;
 
-    // Find the competition document to be deleted
     const deletedCompetition = await Competition.findById(id);
 
     if (!deletedCompetition) {
@@ -567,7 +530,6 @@ const delete_comp = async (req, res) => {
     // Delete the competition document
     await Competition.findByIdAndDelete(id);
 
-    // Send response indicating successful deletion
     res.json({ redirect: '/competitions/home' });
     // res.redirect('/competitions/home');
     
@@ -582,19 +544,15 @@ const delete_comment = async (req, res) => {
   try {
       const { id, index, commentIndex } = req.params;
 
-      // Find the competition by ID
       const competition = await Competition.findById(id);
 
-      // Ensure the competition exists and the announcement index is valid
       if (!competition || index < 0 || index >= competition.announcements.length) {
           return res.status(404).render('404', { title: "Competition or Announcement not found" });
       }
 
-      // Find the announcement and remove the comment
       const announcement = competition.announcements[index];
       announcement.comments.splice(commentIndex, 1);
 
-      // Save the updated competition
       await competition.save();
 
       res.status(200).json({ message: 'Comment deleted successfully' });
@@ -615,7 +573,7 @@ const get_addJudge = async (req, res) => {
       res.status(404).render('404', { title: "Competition not found" });
     }
     
-    // Get followers who are also followed by the current user and are not judges of the competition
+    // Get followers who are followed by the current user and also follow the current user and also are not judges of the competition
     const followers = await User.find({
       $and: [
         { _id: { $in: user.followers } },
@@ -636,28 +594,24 @@ const post_requestJudge = async (req, res) => {
   try {
     const { compId, userId } = req.params;
 
-    // Find the competition
     const competition = await Competition.findById(compId).populate('host');
     if (!competition) {
       res.status(404).render('404', { title: "Competition not found" });
     }
 
-    // Check if the user is already a judge
     if (competition.judges.some(judge => judge.user.equals(userId))) {
       return res.status(400).json({ error: "User is already a judge" });
     }
 
-    // Find the user being requested to be a judge
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).render('404', { title: "User not found" });
     }
 
-    // Add the user as a judge with status "pending"
     competition.judges.push({ user: userId, judgeName: user.username, status: "pending" });
     await competition.save();
 
-    // Create a notification for the user
+    // Create a notification 
     const notificationContent = `${competition.host.username} has requested you to judge ${competition.title}`;
     user.notifications.push({
       type: "judge request",
@@ -683,7 +637,6 @@ const post_judgeAccept = async (req, res) => {
       return res.status(404).render('404', { title: "User not found" });
     }
 
-    // Find the competition
     const competition = await Competition.findById(compId).populate('host');
     if (!competition) {
       return res.status(404).render('404', { title: "Competition not found" });
@@ -697,10 +650,9 @@ const post_judgeAccept = async (req, res) => {
       return res.status(404).render('404', { title: "Notification not found" });
     }
 
-    // Update the notification type to "accept judge"
+    // Update the notification type to "accept judge" to change color
     notification.type = "accept judge";
 
-    // Save the modified user object
     await user.save();
 
     // console.log(competition.judges);
@@ -712,7 +664,6 @@ const post_judgeAccept = async (req, res) => {
       content: notificationContent
     });
 
-    // Save the modified competition object
     await competition.host.save();
 
     // Update the status of the judge to "accepted"
@@ -721,7 +672,6 @@ const post_judgeAccept = async (req, res) => {
       competition.judges[judgeIndex].status = "accepted";
     }
 
-    // Save the modified competition object
     await competition.save();
 
     res.status(200).json({ message: "Judge request accepted successfully" });
@@ -742,7 +692,6 @@ const post_judgeReject = async (req, res) => {
       return res.status(404).render('404', { title: "User not found" });
     }
 
-    // Find the competition
     const competition = await Competition.findById(compId).populate("host");
     if (!competition) {
       return res.status(404).render('404', { title: "Competition not found" });
@@ -756,7 +705,7 @@ const post_judgeReject = async (req, res) => {
       return res.status(404).render('404', { title: "Notification not found" });
     }
 
-    // Update the notification type to "reject judge"
+    // Update the notification type to "reject judge" to change color
     notification.type = "reject judge";
     await user.save();
 
@@ -781,7 +730,7 @@ const post_judgeReject = async (req, res) => {
 
 
 const get_answerQuestion = async (req, res) => {
-  // Extract competition ID and announcement index from request parameters
+
   const { compId, announcementIndex } = req.params;
   const user = req.session.user;
 
@@ -791,8 +740,7 @@ const get_answerQuestion = async (req, res) => {
 
   const questionSet = announcement.questionSet;
 
-  
-  // Render the answer.ejs page with necessary data
+
   res.render('competitions/answer', { compId, announcementIndex, questionSet, user, title: `Answering ${questionSet.title}`});
 };
 
@@ -802,7 +750,7 @@ const post_submitSubmissionAnswer = async (req, res) => {
   const { question } = req.body;
 
   try {
-      const competitionId = req.params.compId; // Assuming you pass competition ID in the URL
+      const competitionId = req.params.compId; 
       const competition = await Competition.findById(competitionId);
 
       // Handle file upload using Multer middleware
@@ -816,13 +764,12 @@ const post_submitSubmissionAnswer = async (req, res) => {
         // Access uploaded file path using req.file
         const filePath = req.file.path;
 
-        // Save submission data to database
         const submissionData = {
             user: user._id,
             username: user.username,
             answers: [{
                 question: question,
-                file: filePath // Store the path to the uploaded file
+                file: filePath 
             }],
             uploadedAt: new Date()
         };
@@ -830,10 +777,9 @@ const post_submitSubmissionAnswer = async (req, res) => {
         competition.announcements[req.body.announcementIndex].questionSet.submittedUsers.push(user._id);
         competition.announcements[req.body.announcementIndex].questionSet.submissions.push(submissionData);
 
-        // Save competition changes to database
         await competition.save();
 
-        res.redirect(`/competitions/${competitionId}`); // Redirect to home page or appropriate page after submission
+        res.redirect(`/competitions/${competitionId}`); 
       });
 
   } catch (error) {
@@ -847,25 +793,22 @@ const get_judgeSubmission = async (req, res) => {
   try {
       const { compId, announcementIndex, submissionIndex } = req.params;
 
-      // Find the competition by ID
       const competition = await Competition.findById(compId);
       if (!competition) {
           return res.status(404).render('404', { title: "Competition not found" });
       }
 
-      // Get the specific announcement using the index
       const announcement = competition.announcements[announcementIndex];
       if (!announcement) {
           return res.status(404).render('404', { title: "Announcement not found" });
       }
 
-      // Get the specific submission using the index
       const submission = announcement.questionSet.submissions[submissionIndex];
       if (!submission) {
           return res.status(404).render('404', { title: "Submission not found" });
       }
 
-      // Render a view to display the submission details for judging
+
       res.render('judgeSubmission', { competition, announcement, submission });
 
   } catch (error) {
@@ -882,7 +825,7 @@ const post_scoreSubmission = async (req, res) => {
       const user = req.session.user;
 
       // console.log(score);
-      // Validate the score input
+
       if (!score || isNaN(score) || score < 1 || score > 100) {
           return res.status(400).send('Invalid score. Please enter a number between 1 and 100.');
       }
@@ -918,22 +861,19 @@ const post_scoreMCQ = async (req, res) => {
   try {
     const { compId, userId } = req.params;
     const { questionType, announcementIndex } = req.body;
-    const userAnswers = req.body; // All answers are sent in the request body
+    const userAnswers = req.body; 
 
-    // Fetch competition and announcement
     const competition = await Competition.findById(compId);
     const announcement = competition.announcements[announcementIndex];
 
     const user1 = await User.findById(userId);
 
-    // Initialize variables for tracking score calculation
     let totalQuestions = 0;
     let correctAnswers = 0;
 
-    // Iterate through each question and check the user's answer
     announcement.questionSet.questions.forEach((question, questionIndex) => {
       const userAnswer = userAnswers[`answer${questionIndex + 1}`];
-      const correctAnswer = question.correctAnswer; // Assuming correct answer is stored in question object
+      const correctAnswer = question.correctAnswer; 
 
       console.log(userAnswer, correctAnswer);
 
@@ -945,7 +885,7 @@ const post_scoreMCQ = async (req, res) => {
     });
 
     // Calculate score (number of correct answers / total questions)
-    const score = (correctAnswers / totalQuestions) * 100; // Multiply by 100 to get percentage
+    const score = (correctAnswers / totalQuestions) * 100; 
 
     console.log(score);
 
@@ -960,7 +900,7 @@ const post_scoreMCQ = async (req, res) => {
     }
 
     announcement.questionSet.submittedUsers.push(user1._id);
-    // Save competition changes to the database
+
     await competition.save();
 
     res.redirect(`/competitions/${compId}/${announcementIndex}`);

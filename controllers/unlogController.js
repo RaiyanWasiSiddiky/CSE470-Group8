@@ -28,7 +28,7 @@ const get_signout = (req, res) => {
             console.error('Error destroying session:', err);
             res.status(500).send('Error signing out');
         } else {
-            // Redirect the user to the home page or login page after signing out
+         
             res.redirect('/');
         }
     });
@@ -78,7 +78,6 @@ const post_login = async (req, res) => {
   
 const post_signup = async (req, res) => {
     try {
-        // Extract user details from the request body
         const { fullname, username, dob, email, password, confirmpassword, securityquestion, securityanswer } = req.body;
 
         // Check if the email is already registered
@@ -105,10 +104,9 @@ const post_signup = async (req, res) => {
             }
         });
 
-        // Save the new user to the database
+
         await newUser.save();
 
-        // Redirect the user to the login page after successful signup
         res.redirect('/login');
 
     } catch (error) {
@@ -122,10 +120,8 @@ const post_resetPassword = async (req, res) => {
     try {
         const { email, securityquestion, securityanswer, firsttry, secondtry } = req.body;
 
-        // Find the user by email
         const user = await User.findOne({ email });
 
-        // Check if the user exists
         if (!user) {
             return res.status(400).json({ error: 'User not found' });
         }
@@ -148,7 +144,6 @@ const post_resetPassword = async (req, res) => {
         user.password = firsttry;
         await user.save();
 
-        // Send a success response
         res.status(200).json({ message: 'Password reset successful' });
     } catch (error) {
         console.error(error);
@@ -157,24 +152,20 @@ const post_resetPassword = async (req, res) => {
 };
 
 
-// Controller function to fetch user data and render the profile page
 const get_profile = async (req, res) => {
     try {
         const user = req.session.user;
-        // Retrieve the user ID from request parameters
+
         const userID = req.params.userId;
 
-        // Find the user by ID in the database and populate the 'competitions' field
         const profileuser = await User.findById(userID).populate('competitions');
 
         // console.log(profileuser);
 
         if (!profileuser) {
-            // If user not found, send 404 Not Found response
             return res.status(404).send('User not found');
         }
 
-        // Render the userProfile.ejs template with the user data
         res.render('profile', { profileuser, title:"Profile Page", user });
     } catch (error) {
         // Handle any errors and send a 500 Internal Server Error response
@@ -186,16 +177,14 @@ const get_profile = async (req, res) => {
 
 const post_updateUserProfile = async (req, res) => {
     try {
-        // Retrieve user ID from session or request body, depending on your authentication method
-        const userId = req.session.user._id; // Assuming the user object in the session contains the user ID
         
-        // Retrieve updated information from request body
+        const userId = req.session.user._id; 
+        
+
         const { fullname, username, email, dob } = req.body;
 
-        // Update the user profile
         await User.findByIdAndUpdate(userId, { fullname, username, email, dob });
 
-        // Send a success response
         res.status(200).send('User profile updated successfully');
     } catch (error) {
         console.error('Error updating user profile:', error);
@@ -206,10 +195,10 @@ const post_updateUserProfile = async (req, res) => {
 
 const post_follow = async (req, res) => {
     const { userID } = req.params;
-    const currentUserID = req.session.user._id; // Assuming the user ID is stored in session
+    const currentUserID = req.session.user._id; 
 
     try {
-        // Find the current user and the user to follow
+        
         const currentUser = await User.findById(currentUserID);
         const userToFollow = await User.findById(userID);
 
@@ -253,7 +242,6 @@ const get_followers =  async (req, res) => {
       .populate("follows")
       .populate("followers");
 
-    // Render the followers.ejs page and pass the user object to it
     res.render('followers', { user, user1, title:`${user1.username}'s Followers` });
 };
 
@@ -289,7 +277,7 @@ const post_unfollow = async (req, res) => {
 
         await userToUnfollow.save();
 
-        // res.redirect(`/followers/${req.session.user._id}`); // Redirect to the followers page
+        // res.redirect(`/followers/${req.session.user._id}`); 
         res.redirect('/login');
 
     } catch (error) {
@@ -308,7 +296,7 @@ const get_notifications = async (req, res) => {
             populate: { path: 'comp' }
         });
         if (!user) {
-            // If user not found, send 404 Not Found response
+    
             return res.status(404).send('User not found');
         }
         // Sort notifications by createdAt in descending order (latest first)

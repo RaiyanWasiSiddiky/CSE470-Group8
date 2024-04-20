@@ -822,7 +822,7 @@ const get_judgeSubmission = async (req, res) => {
 const post_scoreSubmission = async (req, res) => {
   try {
       const { compId, announcementIndex, submissionIndex, userId } = req.params;
-      const score = req.body.score;
+      let score = parseFloat(req.body.score); 
       const user = req.session.user;
 
       // console.log(score);

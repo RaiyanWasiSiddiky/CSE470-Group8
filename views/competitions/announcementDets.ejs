@@ -60,7 +60,7 @@
         <% } %>
 
         <% if (announcement.type === "question") { %>
-            <% if (getTimeLeft(announcement.questionSet.deadline) === "Time Over") { %>
+            <% if (getTimeLeft(announcement.questionSet.deadline) === "Time Over" || comp.finished) { %>
                 <h2>The deadline has been passed, you can no longer make submissions</h2>
             <% } else if (announcement.questionSet.submittedUsers.includes(user._id)) { %>
                 <h2>You have already Answered  :) </h2>

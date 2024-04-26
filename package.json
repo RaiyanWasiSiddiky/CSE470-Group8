@@ -18,6 +18,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
   "keywords": []
 }
